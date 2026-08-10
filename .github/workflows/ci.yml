@@ -1,0 +1,137 @@
+# Set pipeline name.
+name: CI
+
+# Set pipeline triggers. The weekly run is a canary for rot in the environment rather than in the
+# repo: an action that stops resolving, or a package that disappears. Every job pins its runner
+# image rather than taking ubuntu-latest, because the image is a toolchain input like any other,
+# and the figure job below compares PNGs byte for byte, which a font or library change would
+# defeat.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+# Read-only is all any job here needs.
+permissions:
+  contents: read
+
+# A new push to a branch makes the run already in flight redundant.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Fail on the first error in a multi-line run block, and on a failure inside a pipeline.
+defaults:
+  run:
+    shell: bash
+
+# Define pipeline jobs.
+jobs:
+  # The test suites, built and run with no toolkit on the include path.
+  #
+  # That is not a degraded run, it is the run this repository can actually make: there is no
+  # implementation here to test against. What it proves is that every shipped test file compiles,
+  # that the __has_include guards close correctly, and that each lecture's reference tests pass.
+  # A reader with a toolkit runs the same command with AEL_DIR set and gets far more.
+  test:
+    name: Test suites and reference values
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Show the compiler CI is building with
+        run: g++ --version
+
+      - name: Build and run every lecture test suite
+        run: make test
+
+  # Cheap checks that need no compiler, so they report independently of the build.
+  lint:
+    name: Markdown links, house rules, and formatting
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          # The same interpreter the diagrams job uses, and for the same reason: `make numbers`
+          # imports diagrams/models.py. Without this step pip installs into the runner's system
+          # Python, which ubuntu-24.04 marks externally managed, and nothing is cached.
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            diagrams/requirements.txt
+
+      - name: Install the formatters and the drawing dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format
+          pip install -r requirements.txt
+          pip install -r diagrams/requirements.txt
+
+      - name: Check relative Markdown links resolve
+        run: make links
+
+      - name: Check every appendix section cited by prose or a test exists
+        run: make sections
+
+      - name: Check the Markdown house rules
+        run: make markdown
+
+      - name: Check the Markdown tables are aligned
+        run: make tables-check
+
+      - name: Check the numbers quoted in the appendices
+        run: make numbers
+
+      - name: Check the capstone schematic is wired the way L10 says
+        run: make schematic
+
+      - name: Check every appendix names the headers its tests guard on
+        run: make buildable
+
+      - name: Check the C++ and Python are formatted
+        run: make format-check
+
+  # The drawing pins are exact and style.py quantises deterministically, so a rebuild is
+  # byte-identical. That makes drift detectable: edit a figure module without re-committing its
+  # PNG, or hand-edit a generated PNG, and this is where it surfaces.
+  #
+  # It matters more in this course than in its siblings. Almost every figure here is a circuit
+  # schematic, so the figures carry technical content rather than decoration: a mirrored
+  # transistor or a wire attached to the wrong node is an error in the material.
+  diagrams:
+    name: Committed figures match diagrams/build.py
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          # Match the interpreter the committed figures were drawn with.
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: diagrams/requirements.txt
+
+      - name: Install the pinned drawing dependencies
+        run: pip install -r diagrams/requirements.txt
+
+      - name: Redraw every figure and diff it against what is committed
+        run: |
+          python diagrams/build.py
+          git diff --exit-code -- 'lectures/*/appendix/images/*.png'
