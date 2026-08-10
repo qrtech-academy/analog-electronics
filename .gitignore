@@ -1,0 +1,73 @@
+# Ignore everything without an extension.
+*
+!*.*
+!*/
+
+# Don't ignore makefiles.
+!makefile
+!Makefile
+
+# Don't ignore license files.
+!LICENSE
+
+# Ignore .txt files.
+*.txt
+!requirements.txt
+
+# Ignore Python cache.
+*__pycache__/
+
+# Ignore vscode directory.
+*vscode/
+*vs/
+
+# Don't ignore the QAcademy Test framework submodule. Git records a submodule as a gitlink, not
+# as a directory, so the "!*/" above does not reach it and the extensionless name is caught by
+# the "*" on the first line.
+!libs/test
+
+# Ignore everything the builds leave behind. This list mirrors ci/clean.sh's targets, which is
+# the authority on what this repository generates: anything `make clean` removes is by
+# definition something git must not carry. The rules at the top re-include anything with an
+# extension, so every generated file type has to be named here explicitly.
+build/
+temp/
+*.o
+*.d
+*.a
+*.pyc
+
+# GHDL work libraries and simulation artifacts. "e~*" is the elaboration file GHDL's mcode
+# backend leaves next to the design.
+work/
+work-obj*.cf
+*.ghw
+*.vcd
+*.fst
+e~*
+
+# The Python environment used to redraw the diagrams.
+.venv/
+
+# Answers written into an exercise directory while checking that its test suite or testbench
+# accepts a correct one.
+#
+# An exercise directory holds the suite we ship and nothing else: the implementation is the
+# reader's to write, and shipping it early is the one thing the course design rules out.
+# Solving an exercise locally, to check the material we hand out actually accepts a correct
+# answer, leaves that solution sitting in the working tree where a single `git add -A` would
+# publish it. These lines make "not pushed" structural rather than a thing to remember.
+#
+# Published reference implementations live in lectures/*/solutions/, which is deliberately not
+# matched here.
+#
+# The C++ patterns reach one level only, because a gitignore "*" never crosses a "/". So the
+# shipped suites under exercises/test/ are untouched by them and need no re-include -- and must
+# not be given one, because a "!.../test/**" would also un-ignore the compiled binary that the
+# rules at the top of this file are there to hide. The VHDL pattern has to reach one level
+# deeper, because a VHDL exercise is a directory rather than a file, so it names the testbench
+# back in explicitly.
+lectures/*/exercises/*.cpp
+lectures/*/exercises/*.hpp
+lectures/*/exercises/*/*.vhd
+!lectures/*/exercises/*/*_tb.vhd
