@@ -1,0 +1,24 @@
+# Pinned exactly: these figures are committed as PNGs, and an unpinned upgrade would re-render
+# them slightly differently and show up as a noisy binary diff. CI redraws every figure and
+# diffs it byte for byte, so a version drift here is a failing build rather than a surprise.
+#
+# schemdraw does most of the work in this course, which is the opposite of the sibling courses.
+# The great majority of the figures in this course are circuit diagrams: bias networks,
+# small-signal schematics, current mirrors, differential pairs, output stages. Every one of them
+# is generated from the code in this directory, because a rasterised schematic cannot be
+# relabelled, corrected, or checked against the numbers an appendix quotes.
+schemdraw==0.23
+
+# matplotlib draws the rest: Bode magnitude and phase, load lines, transfer curves, the collector
+# current against temperature, the crossover region of a class-AB stage. It is also schemdraw's
+# rendering surface for PNG output, so it would be a direct dependency even if nothing here
+# plotted a curve.
+matplotlib==3.11.1
+
+# Imported directly by style.py to write the figures as palette PNGs, which is what keeps the
+# committed diffs small and reproducible.
+pillow==12.3.0
+
+# Pulled in by matplotlib, but imported directly by models.py for the sweeps and the numerical
+# work behind every computed figure, so it is pinned here for the same reason pillow is.
+numpy==2.5.1
