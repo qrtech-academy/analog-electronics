@@ -1,0 +1,84 @@
+% Section 10.1, from lectures/L10/appendix/a_the_amplifier.md.
+
+\section{The amplifier, stage by stage}
+\label{c10:app:a}
+
+Eleven transistors, and not one of them is new.
+
+\subsection{The black box, opened}
+\label{c10:sec:a1}
+Chapter~\ref{c3:ch:filters}~(Chapter~\ref{c3:ch:filters}) used an operational amplifier on the promise that this chapter would build one.
+
+\bookfigure{lectures/L10/appendix/images/opamp_stages.png}{A block diagram of four stages: a differential pair, a Darlington follower, a common-emitter stage and a class-AB output, with the gain of each above it and the open-loop and closed-loop figures below.}{c10:fig:opampstages}
+
+\begin{booktable}{@{}lLLl@{}}
+  \thead{Stage} & \thead{What it is} & \thead{What it is responsible for} & \thead{Gain} \\
+  \midrule
+  1 & Mirror-loaded differential pair & Gain, and \textbf{every input specification there is} & 1895 \\
+  2 & Darlington emitter follower & Nothing, except not loading stage 1 & 0.96 \\
+  3 & Common-emitter, current-source load & Most of the open-loop gain, and the dominant pole & 570 \\
+  4 & Class-AB Darlington output & Current, and a low output resistance & 0.95 \\
+\end{booktable}
+
+\textbf{Two of the four have no voltage gain.} They are six of the eleven transistors, and \secref{c10:sec:b2} is about why they are the most valuable part of the amplifier.
+
+\subsection{The whole thing}
+\label{c10:sec:a2}
+\bookfigure{lectures/L10/appendix/images/amplifier.png}{The complete amplifier: a differential pair with a PNP current-mirror load and a current-source tail, feeding a Darlington emitter follower, feeding a common-emitter stage with a current-source load and a Miller capacitor, feeding a class-AB output stage of two complementary Darlingtons with a two-diode bias and emitter resistors, driving an eight ohm loudspeaker between supply rails.}{c10:fig:amplifier}
+
+Every block is a circuit from an earlier chapter:
+
+\begin{itemize}
+  \item \textbf{Q1, Q2, M1, M2 and the tail} are Chapter~\ref{c9:ch:diffpair}~(Chapter~\ref{c9:ch:diffpair})'s mirror-loaded pair, entire.
+  \item \textbf{Q3 and Q4} are Chapter~\ref{c8:ch:follower}~(Chapter~\ref{c8:ch:follower})'s Darlington follower.
+  \item \textbf{Q5} is Chapter~\ref{c7:ch:smallsignal}~(Chapter~\ref{c7:ch:smallsignal})'s common-emitter stage with the current-source load of \secref{c7:sec:b4}.
+  \item \textbf{Q6 to Q9, the diodes and the 0.22 ohm resistors} are \secref{c8:sec:b3}'s class-AB output stage, each half a Darlington.
+  \item \textbf{$C_c$} is the only component here this book has not built, and is \secref{c10:sec:b4}'s subject.
+\end{itemize}
+\textbf{The three current sources are drawn as current sources rather than as mirrors} because that is what they are, small-signal: a resistance of $r_o$ with a current through it that does not depend on the node voltage. Each is two more transistors in a real build, and \secref{c9:sec:b3} established why they are not resistors.
+
+\subsection{Stage 1: the pair, and why it is first}
+\label{c10:sec:a3}
+\textbf{The input stage decides every input specification the amplifier has:} offset, input current, input resistance, common-mode range, common-mode rejection, most of the noise. \textbf{Nothing downstream improves any of them,} because feedback divides down what happens \emph{after} the input, not \emph{at} it. It also has to have gain, because the loop gain starts here.
+
+\textbf{Mirror-loaded, for the two reasons of \secref{c9:sec:b4}.} The mirror recovers the half a single-ended output would discard and presents $r_o$ rather than a resistor. 1923 unloaded.
+
+\subsection{Stage 2: the buffer, which does nothing}
+\label{c10:sec:a4}
+Stage 3 is a common-emitter stage at 1 mA, so its input resistance is $\beta r_e$: \textbf{1.3 kilohm}. Stage 1's output resistance is \textbf{50 kilohm}. Connect them directly and stage 1 keeps
+
+\[
+  \frac{1300}{50000 + 1300} = 2.5\ \text{per cent}
+\]
+
+of its gain. \textbf{1923 becomes 48.7, and the amplifier has lost 32 dB before doing anything.}
+
+\textbf{So a follower goes between them,} a Darlington one: a single follower would present $\beta(r_e + 1300) = 66$ kilohm, only a little more than the 50 it is protecting. The Darlington presents $\beta^2(2r_e + 1300) = 3.4$ megohm and stage 1 keeps 98.5 per cent.
+
+\textbf{It costs 0.34 dB of signal and it is worth 31.5 dB of loop gain.}
+
+\subsection{Stage 3: where the gain is}
+\label{c10:sec:a5}
+A common-emitter stage at 1 mA with a current-source load, $r_o$ against $r_o$, so 50 kilohm and an unloaded gain of $50000/26 = 1923$: the same as stage 1 and for the same reason.
+
+\textbf{Undegenerated,} because every ohm in its emitter divides the gain (\secref{c7:sec:a5}) and this stage exists to produce gain. The cost is \secref{c10:sec:b3}: it has no stable operating point of its own, and only the loop gives it one.
+
+\textbf{It is also where the compensation goes,} the highest-impedance node being the cheapest place to put a dominant pole (\secref{c10:sec:b4}).
+
+\subsection{Stage 4: the output, which also does nothing}
+\label{c10:sec:a6}
+Class AB from Chapter~\ref{c8:ch:follower}~(\secref{c8:app:b}), idling at 120 mA with 0.22 ohm emitter resistors and two diodes of bias that must sit on the heatsink.
+
+\textbf{Each half is a Darlington,} for stage 2's reason: an 8 ohm loudspeaker behind a single follower presents 411 ohm to a stage with 50 kilohm of output resistance, which would keep 0.8 per cent of its gain. Behind a Darlington it presents \textbf{21 kilohm} and stage 3 keeps 30 per cent.
+
+\textbf{Thirty per cent is still the largest single loss in the amplifier,} 10.6 dB: the price of driving 8 ohms from a 50 kilohm node, and no arrangement of two transistors gets it back. A third would, which is \secref{c8:sec:c2}'s triple emitter follower.
+
+\subsection{What this section is blind to}
+\label{c10:sec:a7}
+\begin{itemize}
+  \item \textbf{Every frequency except one.} The compensation pole is discussed; the other poles, and so the actual stability margin, are computed nowhere.
+  \item \textbf{Slew rate,} the tail current over the compensation capacitor, and the one large-signal specification a reader could compute from what is here (\secref{c9:sec:a4}).
+  \item \textbf{Start-up.} The three current sources have to start, and a mirror whose reference derives from its own output has a stable state at zero current. Real designs include a start-up circuit.
+  \item \textbf{Supply rejection.} The rails are drawn as ideal. They are not.
+  \item \textbf{Everything about layout,} which decides how much of the above survives being built.
+\end{itemize}

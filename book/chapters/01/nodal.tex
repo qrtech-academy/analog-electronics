@@ -1,0 +1,111 @@
+% Section 1.2, from lectures/L01/appendix/b_nodal_analysis.md.
+
+\section{Nodal analysis, and what to build}
+\label{c1:app:b}
+
+The method that turns a circuit into a matrix, and the specification of the two components this chapter asks you to write. \secref{c1:sec:b5} is the specification; everything before it is what you need in order to write it.
+
+\subsection{One unknown per node}
+\label{c1:sec:b1}
+Solving by hand means picking loops and current directions until the equations match the unknowns. The choices are yours rather than the circuit's, so it does not generalise into code.
+
+\textbf{Nodal analysis makes them for you:} node voltages are the unknowns, the current law at each node supplies the equations, and the count comes out right. Ground is not one of them, so a circuit with $n$ nodes has $n - 1$ unknowns. \textbf{Five nodes is four unknowns.}
+
+\subsection{The conductance stamp}
+\label{c1:sec:b2}
+For a resistor between nodes $a$ and $b$, the current leaving $a$ through it is
+
+\[
+  I_{a \to b} = \frac{V_a - V_b}{R} = G(V_a - V_b), \qquad G = \frac{1}{R}
+\]
+
+In $\mathbf{G}\mathbf{v} = \mathbf{i}$ one resistor contributes exactly four entries, always these four:
+
+\[
+  G_{aa} \mathrel{+}= G, \quad G_{bb} \mathrel{+}= G, \quad G_{ab} \mathrel{-}= G, \quad G_{ba} \mathrel{-}= G
+\]
+
+That pattern is a \textbf{stamp}, and it is the whole technique: never derive an equation, walk the element list, add each stamp, solve. Two consequences, both tested by the shipped suite:
+
+\begin{itemize}
+  \item \textbf{The diagonal accumulates.} Two resistors between the same pair of nodes stamp twice, giving the parallel combination without anyone computing one. A solver that assigns one matrix row per \emph{element} rather than per \emph{node} gets this wrong, and gets it wrong quietly.
+  \item \textbf{Ground is skipped.} An entry whose row or column is ground is not written, which is why a resistor to ground contributes one entry rather than four.
+\end{itemize}
+A current source does not enter $\mathbf{G}$ at all; it adds to the right-hand side at its two nodes.
+
+\subsection{The trouble with a voltage source}
+\label{c1:sec:b3}
+A voltage source has no conductance: its current is whatever the circuit demands, so it cannot be stamped. Add that current as an extra unknown and its constraint as an extra equation:
+
+\[
+  V_p - V_n = V_{source}
+\]
+
+One extra row and column per source, and the matrix stops being purely a conductance matrix. That is the whole of the ``modified'' in \textbf{modified nodal analysis}. The extra unknown says how much a supply delivers, which is how Chapter~\ref{c6:ch:bias} checks a bias point and Chapter~\ref{c10:ch:amplifier} a power budget.
+
+\subsection{Two conventions this book fixes}
+\label{c1:sec:b4}
+Pinned by this chapter's test suite, because every component in the rest of the book reads them.
+
+\textbf{A current source injects at its second node.} \code{addCurrentSource(from, to, current)} takes current out of \code{from} and pushes it into \code{to}. One milliamp into a node with one kilohm to ground puts that node at $+1$ V.
+
+\textbf{A voltage source reports the current leaving its positive terminal.} \code{sourceCurrents[k]} flows out of source $k$'s positive terminal into the circuit; a 10 V source driving one kilohm reports $+10$ mA.
+
+\textbf{That is the opposite sign to the raw modified-nodal unknown,} which comes out as the current flowing from the node into the source. Negating it is your job, and the suite checks that you did.
+
+\subsection{What to build}
+\label{c1:sec:b5}
+Two headers. The paths are part of the specification: the test suite includes exactly these, and a component written anywhere else stays dormant however correct it is.
+
+\subsubsection{\code{ael/net/netlist.hpp}}
+A container. It holds elements and hands them to the solver, and it does nothing else.
+
+\begin{booktable}{@{}LL@{}}
+  \thead{Member} & \thead{Contract} \\
+  \midrule
+  \code{using Node = std::size_t} & A node index. \\
+  \code{constexpr Node Ground{0}} & Node zero is ground, always. \\
+  \code{addResistor(Node a, Node b, double resistance)} & Adds a resistor. \\
+  \code{addCurrentSource(Node from, Node to, double current)} & Injects at \code{to}. See \secref{c1:sec:b4}. \\
+  \code{addVoltageSource(Node positive, Node negative, double voltage)} & Fixes the difference. \\
+  \code{nodeCount()} & Highest node index mentioned, plus one. An empty netlist returns 1. \\
+  \code{resistorCount()}, \code{voltageSourceCount()}, \code{currentSourceCount()} & Element counts, by kind. \\
+\end{booktable}
+
+Nodes are mentioned rather than declared: there is no ``add a node'' call, because that would put a bookkeeping step in front of every exercise in the book.
+
+The solver needs to read the elements back out. How you expose them is yours to decide; the tests only require that \code{solve} can be handed a \code{const Netlist&}.
+
+\subsubsection{\code{ael/mna/solver.hpp}}
+\begin{cppcode}
+namespace ael::mna
+{
+struct Solution
+{
+    std::vector<double> nodeVoltages{};    ///< Indexed by Node. [Ground] is always 0.
+    std::vector<double> sourceCurrents{};  ///< One per voltage source, in insertion order.
+    bool solved{false};                    ///< False if the network has no unique solution.
+};
+
+[[nodiscard]] Solution solve(const net::Netlist& netlist) noexcept;
+}
+\end{cppcode}
+
+Assemble from the stamps in \secref{c1:sec:b2} and \secref{c1:sec:b3}, then solve by Gaussian elimination with partial pivoting.
+
+\textbf{\code{solved} is not decoration.} A floating node, or two voltage sources contradicting each other, gives a singular matrix. A solver that returns zeros there will be believed, and the reader spends an hour looking for the fault in their circuit rather than in their assumptions. Detect the singular pivot and say so. The suite has a test for exactly this.
+
+\subsubsection{What good looks like}
+Around 120 lines for both, of which the elimination is about 20. If yours is much longer, you are probably special-casing element kinds somewhere that a stamp would have handled.
+
+\subsection{Why write a solver at all}
+\label{c1:sec:b6}
+\textbf{From Chapter~\ref{c7:ch:smallsignal} this book computes every stage twice:} once from a closed form you can reason about, once from a solver that knows nothing about amplifiers. Where they agree, the closed form is trustworthy and simpler. Where they disagree, one is dropping a term, and finding out which is the exercise. That only works if the solver is yours; a number from a tool you did not write is an authority claim.
+
+\subsection{What this section is blind to}
+\label{c1:sec:b7}
+\begin{itemize}
+  \item \textbf{Conditioning.} A direct solve handles the three or four orders of magnitude here without complaint. Chapter~\ref{c4:ch:feedback} brings a diode and twelve orders, at which point pivoting stops being a formality.
+  \item \textbf{Sparsity.} Real simulators store the matrix sparsely and order it to limit fill-in. Nothing in this book is large enough for that to matter.
+  \item \textbf{Anything time-varying.} This is a DC solve; Chapter~\ref{c2:ch:reactance} makes it complex, which covers one frequency in steady state. There is no transient analysis, so an underdamped filter's ringing is something Chapter~\ref{c3:ch:filters} computes rather than watches.
+\end{itemize}

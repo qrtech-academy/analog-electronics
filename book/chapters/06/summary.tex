@@ -1,0 +1,44 @@
+% Section 6.3, from lectures/L06/README.md: the objectives, the questions,
+% the further reading, and what the next chapter does with all of it.
+
+
+\section{Review}
+\label{c6:sec:review}
+
+\needspace{6\baselineskip}
+\subsection*{What you should be able to do now}
+After this chapter, you should be able to:
+\begin{itemize}
+  \item Find the quiescent point of a divider-biased stage, including the base current's effect.
+  \item Say what divider stiffness is, choose it, and say what the usual rule of thumb costs.
+  \item State the thermal drift of a base-emitter voltage, and the collector current drift it implies at a fixed base voltage.
+  \item Explain what an emitter resistor does, in terms of feedback rather than in terms of a story about voltages moving.
+  \item Compute the drift suppression, and notice it is the same number as the gain reduction.
+  \item Apply the 220 mV rule and say where it comes from.
+  \item Recognise an argument that is self-contradictory, from its own numbers.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Questions to test yourself}
+You should be able to answer:
+\begin{enumerate}
+  \item A divider is designed for 1.71 V and measures 1.60 V with the transistor connected. Nothing is broken. What is happening, and which Chapter~\ref{c1:ch:circuits} result predicts it?
+  \item Divider current ten times base current is the usual rule. What error in the collector current does that rule accept?
+  \item At a fixed base voltage the collector current rises 8 per cent per degree. Where does that number come from, and which of $V_T$ or $I_S$ contributes most of it?
+  \item An emitter resistor reduces drift and reduces gain. By what factor each, and why is that not a coincidence?
+  \item The 220 mV rule puts about a fifth of a volt across the emitter resistor. What would 22 mV give, and what would 2.2 V give?
+  \item Somebody argues that when the current rises 10 per cent, the base-emitter voltage falls from 0.65 V to 0.55 V and pulls it back. Find the contradiction.
+  \item Your stage is biased at 1 mA and drifts 0.2 per cent per degree. What would it drift at 10 mA with the same emitter resistor?
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\subsection*{Further reading}
+\begin{itemize}
+  \item \emph{The Art of Electronics}, Horowitz and Hill, chapter 2, sections on biasing, for a second treatment of the same material.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Looking ahead}
+\begin{itemize}
+  \item Chapter~\ref{c7:ch:smallsignal} is the centre of the book. The small-signal model, the intrinsic emitter resistance the whole of Part~2 is written in terms of, and the emitter factor, including the node it actually belongs to.
+\end{itemize}

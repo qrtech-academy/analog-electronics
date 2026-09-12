@@ -1,0 +1,45 @@
+% Section 8.4, from lectures/L08/README.md: the objectives, the questions,
+% the further reading, and what the next chapter does with all of it.
+
+
+\section{Review}
+\label{c8:sec:review}
+
+\needspace{6\baselineskip}
+\subsection*{What you should be able to do now}
+After this chapter, you should be able to:
+\begin{itemize}
+  \item Derive a follower's gain, input resistance and output resistance from the same model as Chapter~\ref{c7:ch:smallsignal}.
+  \item Say what a follower costs and what it buys, in ohms rather than in adjectives.
+  \item Compute what a given load does to a given stage, and choose between a follower, a Darlington and a redesign.
+  \item State the three amplifier classes by what conducts when, and give the efficiency of each.
+  \item Explain crossover distortion, and why it is worse than its size suggests.
+  \item Size the emitter resistors of a class-AB stage from the idle current.
+  \item Say why the bias generator must be thermally coupled to the output devices, and what happens if it is not.
+  \item Carry every follower result to a MOSFET, and name the one thing that stops it being exact.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Questions to test yourself}
+You should be able to answer:
+\begin{enumerate}
+  \item A follower's gain is 0.974. Where did the other 2.6 per cent go, and what would you change to get it back?
+  \item Looking into a follower's base with 8 ohms on its emitter, what do you see? Now say it again with the beta spread included.
+  \item Why does a stage with 10 kilohms of output resistance lose 99.9 per cent of its gain into a loudspeaker, when the same load costs a follower only 3 per cent?
+  \item Class B is 78 per cent efficient and class A is 25. Why is class A used at all?
+  \item A class-AB stage idles at 120 mA. What emitter resistors does the 26 mV rule give, and what is the emitter factor it produces?
+  \item The bias generator is two silicon diodes. Name the failure that follows from mounting them on the circuit board instead of the heatsink.
+  \item A source follower's gain is lower than an emitter follower's at the same current. Give the number and the reason.
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\subsection*{Further reading}
+\begin{itemize}
+  \item \emph{The Art of Electronics}, Horowitz and Hill, chapter 2, for followers, and chapter 2x for output stages at more length than this book has room for.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Looking ahead}
+\begin{itemize}
+  \item Chapter~\ref{c9:ch:diffpair} is the stage that subtracts: the differential pair, what its tail decides, and why the current mirror of Chapter~\ref{c7:ch:smallsignal} turns up again as its load.
+\end{itemize}

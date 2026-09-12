@@ -1,0 +1,142 @@
+% Section 2.1, from lectures/L02/appendix/a_reactance_and_phasors.md.
+
+\section{Reactance, time constants, and phasors}
+\label{c2:app:a}
+
+Two new devices and one trick; the frequency domain falls out of the trick rather than being imposed on top of it.
+
+\subsection{Two devices that remember}
+\label{c2:sec:a1}
+A resistor's current depends on the voltage across it now. That is the whole of Chapter~\ref{c1:ch:circuits}. A capacitor and an inductor depend on a rate of change instead:
+
+\[
+  I = C \frac{dV}{dt}, \qquad V = L \frac{dI}{dt}
+\]
+
+\textbf{Both have memory,} so a circuit containing one has no single answer, only a trajectory, and the method of Chapter~\ref{c1:ch:circuits} cannot solve it. The two are duals. This book leans on the capacitor, which is cheap, accurate and small; inductors appear in Chapter~\ref{c3:ch:filters}'s filters and then almost nowhere.
+
+\subsection{The time constant}
+\label{c2:sec:a2}
+\[
+  V(t) = V_0 \left( 1 - e^{-t/\tau} \right), \qquad \tau = RC
+\]
+
+One time constant reaches 63.2 per cent, five reach 99.33 per cent. What is usually forgotten:
+
+\begin{narrowtable}{@{}ll@{}}
+  \thead{Accuracy wanted} & \thead{Time constants needed} \\
+  \midrule
+  10 per cent & 2.3 \\
+  1 per cent & 4.6 \\
+  0.1 per cent & 6.9 \\
+  0.01 per cent & 9.2 \\
+\end{narrowtable}
+
+$n = \ln(1/\epsilon)$, so each further decade of accuracy costs 2.3 more time constants. \textbf{A time constant is not the time it takes, but the time it takes to get $e$ times closer.}
+
+\subsection{The trick, and what it depends on}
+\label{c2:sec:a3}
+\textbf{In a linear circuit driven by a sinusoid, every voltage and current in it is a sinusoid at the same frequency.} Nothing can create a new one, so only amplitude and phase differ from node to node, and a complex number carries exactly those two. Write the excitation as $V e^{j\omega t}$, the common factor cancels from every equation, and what remains is algebra on \textbf{phasors}.
+
+\[
+  \frac{dv}{dt} = j\omega V e^{j\omega t}
+\]
+
+\textbf{Differentiation becomes multiplication by $j\omega$,} so $I = C\,dV/dt$ becomes $I = j\omega C V$: Ohm's law with a complex conductance.
+
+\textbf{It depends on linearity and on the steady state.} A diode has no phasor description at all, because it creates harmonics that were not in the excitation. That is why Chapter~\ref{c4:ch:feedback} solves nonlinear circuits a different way, and why Chapter~\ref{c7:ch:smallsignal} linearises a transistor before putting a phasor near one.
+
+\subsection{Impedance}
+\label{c2:sec:a4}
+\[
+  Z_C = \frac{1}{j\omega C}, \qquad Z_L = j\omega L
+\]
+
+The magnitudes are the \textbf{reactances}, and they are what a meter would read:
+
+\[
+  |Z_C| = \frac{1}{2\pi f C}, \qquad |Z_L| = 2\pi f L
+\]
+
+\bookfigure{lectures/L02/appendix/images/reactance.png}{Impedance magnitude against frequency for a 1 kilohm resistor, a 1 microfarad capacitor and a 10 millihenry inductor, on logarithmic axes. The resistor is a horizontal line, the capacitor falls and the inductor rises, and the inductor and capacitor cross at 1592 hertz.}{c2:fig:reactance}
+
+A capacitor's impedance falls with frequency and an inductor's rises, both at six decibels per octave. The three crossings are three different things, and keeping them apart is most of Chapter~\ref{c3:ch:filters}:
+
+\begin{itemize}
+  \item \textbf{R crosses C} at 159 Hz: an RC corner, set by the resistor.
+  \item \textbf{R crosses L} at 15.9 kHz: an RL corner, set by the resistor too.
+  \item \textbf{L crosses C} at 1592 Hz: a \textbf{resonance}, set by no resistor at all.
+\end{itemize}
+\textbf{The $j$ matters as much as the magnitude.} A capacitor's current leads its voltage by 90 degrees and an inductor's lags; that sign decides whether a feedback loop is stable.
+
+\subsection{The first-order response}
+\label{c2:sec:a5}
+The Chapter~\ref{c1:ch:circuits} divider formula still applies, with impedances instead of resistances:
+
+\[
+  H(j\omega) = \frac{Z_C}{R + Z_C} = \frac{1}{1 + j\omega RC}
+\]
+
+The \textbf{corner frequency} is where the reactance equals the resistance:
+
+\[
+  f_c = \frac{1}{2\pi RC}
+\]
+
+For 1 kilohm and 159 nanofarads that is 1001 Hz.
+
+\bookfigure{lectures/L02/appendix/images/rc_bode.png}{Two panels. On the left, the magnitude of a first-order low-pass against frequency normalised to its corner, flat then falling at twenty decibels per decade, with the exact curve and its two straight-line asymptotes and a marker three decibels down at the corner. On the right, the phase falling from zero to minus ninety degrees, passing minus forty five at the corner.}{c2:fig:rcbode}
+
+\begin{narrowtable}{@{}lll@{}}
+  \thead{At} & \thead{Magnitude} & \thead{Phase} \\
+  \midrule
+  A decade below the corner & 0.04 dB down & 5.7 degrees \\
+  The corner & 3.01 dB down & 45 degrees \\
+  A decade above & 20.04 dB down & 84.3 degrees \\
+  Far above & falling 20 dB per decade & 90 degrees \\
+\end{narrowtable}
+
+The magnitude is two straight lines and a corner, and drawing it from $f_c$ alone is a skill.
+
+\textbf{The phase is the half that gets skipped.} A decade below the corner the magnitude has lost 0.04 dB, which is nothing, and the phase has moved 5.7 degrees, which is not. The magnitude says whether a loop has gain left; the phase says whether that gain helps or hurts. Chapter~\ref{c4:ch:feedback} needs both.
+
+\subsection{Decibels, briefly}
+\label{c2:sec:a6}
+\[
+  A_{dB} = 20 \log_{10} \left| \frac{V_{out}}{V_{in}} \right|
+\]
+
+The factor is 20 rather than 10 because the decibel was defined for power and power goes as voltage squared. Every ratio in this book is a voltage ratio, so it is always 20.
+
+\begin{narrowtable}{@{}ll@{}}
+  \thead{Ratio} & \thead{Decibels} \\
+  \midrule
+  1 & 0 \\
+  $\sqrt{2}$ & 3.01 \\
+  2 & 6.02 \\
+  10 & 20 \\
+  100 & 40 \\
+  1000 & 60 \\
+\end{narrowtable}
+
+\textbf{The second row is the one that matters:} a filter's corner is where it is 3 dB down, which is $1/\sqrt{2}$ in amplitude and half in power.
+
+\subsection{The transformer, briefly}
+\label{c2:sec:a7}
+Two coils sharing a magnetic circuit. The voltage ratio is the turns ratio, the current ratio its inverse, and an impedance on the secondary is reflected to the primary by the ratio squared.
+
+\[
+  \frac{V_2}{V_1} = \frac{N_2}{N_1}, \qquad Z_{reflected} = \left(\frac{N_1}{N_2}\right)^2 Z_2
+\]
+
+The book uses the second form once, as the cleanest example of impedance transformation, which is what Chapter~\ref{c8:ch:follower}'s emitter follower does by a completely different mechanism for the same reason.
+
+\textbf{The model stops being true quickly:} real transformers have leakage inductance, winding resistance, a finite magnetising inductance that shorts the primary at low frequency, and a core that saturates. All of that decides whether a design works, and none of it is in the ratio above.
+
+\subsection{What this section is blind to}
+\label{c2:sec:a8}
+\begin{itemize}
+  \item \textbf{Transients.} Everything here is steady state. What a filter does in the first few time constants after a step is a calculation this book never makes.
+  \item \textbf{Real components.} A capacitor has series resistance and inductance, so its impedance stops falling and starts rising: a real 1 microfarad part is inductive above a few megahertz.
+  \item \textbf{Distributed effects.} At high enough frequency a wire is not a node. That boundary is outside this book and inside the working range of a modern transistor.
+\end{itemize}

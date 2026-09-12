@@ -1,0 +1,153 @@
+% Section 9.2, from lectures/L09/appendix/b_rejection_and_the_mirror.md.
+
+\section{Rejection, the mirror, and what limits it}
+\label{c9:app:b}
+
+Where the rejection comes from, which is not where most people guess, and the load that wins two independent factors at once.
+
+\subsection{Common mode, and the tail doubled}
+\label{c9:sec:b1}
+Drive both bases with the same $v_{cm}$: both halves want more current, the tail cannot supply it, so the tail node rises and the current barely changes. \textbf{The tail carries the sum of both currents,} so a resistance $R_{tail}$ in the tail behaves as $2R_{tail}$ in one half's own emitter, and it is Chapter~\ref{c7:ch:smallsignal}'s degenerated stage unchanged:
+
+\[
+  A_{cm} = -\frac{R_C}{2R_{tail} + r_e}
+\]
+
+With 10 kilohm in the tail and a 2 mA pair, $-0.50$: a gain of \emph{one half} for signals both inputs share, against 192 for signals they do not.
+
+\textbf{Nothing new has been introduced:} the emitter factor of \secref{c7:sec:a5} with $R_E = 2R_{tail}$. The pair is two old circuits wired so one input sees degeneration and the other does not.
+
+\subsection{CMRR, and the term that cancels}
+\label{c9:sec:b2}
+\[
+  CMRR = \frac{A_{dm}}{A_{cm}} = \frac{R_C/2r_e}{R_C/(2R_{tail} + r_e)} = \frac{2R_{tail} + r_e}{2 r_e}
+\]
+
+\textbf{Look at what happened to $R_C$.} It cancelled, exactly and completely.
+
+\[
+  \boxed{\;CMRR \approx \frac{R_{tail}}{r_e}\;}
+\]
+
+\textbf{No choice of collector resistor improves rejection, and neither does the gain.} Doubling $R_C$ doubles both gains and rejects exactly as badly. The instinct is universally the other way, rejection feeling like it should be about matching or about gain: \textbf{it is about the tail and only the tail.}
+
+\bookfigure{lectures/L09/appendix/images/cmrr_against_tail.png}{Common-mode rejection ratio in decibels against the resistance the tail presents, on a logarithmic axis, rising 20 dB per decade, with the resistor-tail and current-source-tail regions marked and the supply voltage each would need annotated.}{c9:fig:cmrragainsttail}
+
+\subsection{Which makes it a supply-voltage question}
+\label{c9:sec:b3}
+A resistor in the tail carries the tail current, so a tail resistance implies a voltage, $V_{tail} = I_{tail} R_{tail}$.
+
+\begin{narrowtable}{@{}llll@{}}
+  \thead{Tail} & \thead{CMRR} & \thead{In decibels} & \thead{Volts across it at 2 mA} \\
+  \midrule
+  1 kilohm & 39 & 32 dB & 2 V \\
+  10 kilohm & 385 & 52 dB & 20 V \\
+  100 kilohm & 3847 & 72 dB & 200 V \\
+  260 kilohm & 10000 & \textbf{80 dB} & \textbf{520 V} \\
+  1 megohm & 38462 & 92 dB & 2000 V \\
+\end{narrowtable}
+
+\textbf{80 dB of rejection from a resistor needs 520 V of supply,} and 80 dB is unremarkable. A current source presents hundreds of kilohms of \emph{incremental} resistance while dropping a volt or two of \emph{actual} voltage, because its resistance is $r_o$. \textbf{That is the whole reason the tail is a current source,} and it generalises: \textbf{a current source has a large resistance without a large voltage across it.}
+
+\textbf{A cascoded mirror} raises $r_o$ by another $\beta$ (\secref{c7:sec:b5}): another 34 dB for one transistor and 0.7 V of headroom, the usual integrated arrangement.
+
+\subsection{The mirror load, and its two mechanisms}
+\label{c9:sec:b4}
+\bookfigure{lectures/L09/appendix/images/mirror_loaded_pair.png}{A differential pair with a PNP current mirror as its load: the two mirror transistors' emitters to the positive rail, their bases tied, the left one diode-connected to the left pair collector, and the output taken at the right collector.}{c9:fig:mirrorloadedpair}
+
+Replace the collector resistors with a \textbf{current mirror}: two PNP devices, emitters to the rail, bases tied, the left diode-connected. M1 carries whatever Q1 carries and M2 copies it into the output node, so a differential input has the mirror pushing the output up while Q2 pulls it down. \textbf{Both halves now drive the output.}
+
+\[
+  A_{dm} = -\frac{r_{o(n)} \parallel r_{o(p)}}{r_e}
+\]
+
+\textbf{1923 against 192, and it is two separate factors:}
+
+\begin{itemize}
+  \item \textbf{A factor of two from the mirror as a mirror.} The two in $R_C/2r_e$ came from throwing one collector away, and the mirror stops throwing it away. Nothing to do with resistance.
+  \item \textbf{A factor of five from the load.} $r_o \parallel r_o$ is 50 kilohm where the resistor was 10. Nothing to do with mirroring.
+\end{itemize}
+\textbf{They multiply, and textbooks run them together.} Only the second is available to a resistively loaded stage, and only the first survives when the next stage's input resistance dominates the output node. \textbf{Third distinct job for one device:} stopping Chapter~\ref{c7:ch:smallsignal}'s degeneration boost being swamped, giving the tail resistance without voltage, and recovering the discarded half.
+
+\subsection{The other output, and why the answer changes completely}
+\label{c9:sec:b5}
+Everything above takes the output at \textbf{one collector}. Take the \textbf{difference between the two collectors} instead and the rejection is set by something else entirely, 46 decibels away.
+
+\textbf{Why.} A common-mode input moves both collectors down equally. Single-ended, that motion \emph{is} the output, so the tail alone decides its size. Differentially it appears on both collectors and \textbf{subtracts out exactly}, provided the halves match, and what survives is the mismatch:
+
+\[
+  CMRR_{diff} = \frac{2R_{tail}}{\delta\, r_e}
+\]
+
+\begin{booktable}{@{}Lll@{}}
+  \thead{Output taken} & \thead{Limited by} & \thead{With a 10 kilohm tail} \\
+  \midrule
+  One collector & the tail alone & 52 dB \\
+  Both, 5 per cent mismatch & tail and matching & 84 dB \\
+  Both, 1 per cent mismatch & tail and matching & 98 dB \\
+  Both, 0.1 per cent mismatch & tail and matching & 118 dB \\
+\end{booktable}
+
+\textbf{Forty-six decibels, from 1 per cent resistors and where you put the voltmeter.} Same circuit.
+
+\textbf{So ``the CMRR of a differential pair'' is not a statement about a circuit} unless it says which output is taken: different limits, different fixes, two orders of magnitude apart at ordinary tolerances.
+
+\textbf{And it explains where integrated amplifiers get their 100 dB:} not exotic tails, but two devices adjacent on one die matching to a fraction of a per cent, output differentially so that matching becomes rejection. The same schematic in discrete parts, single-ended, gives 52 dB.
+
+\textbf{Why this book still takes the single-ended output:} an operational amplifier's second stage has one input, and taking the difference with a current mirror is \secref{c9:sec:b4}.
+
+\subsection{Offset, matching, and why modern input stages are MOSFET}
+\label{c9:sec:b6}
+With both inputs at zero the output should sit at its quiescent value. It does not, and the difference referred back to the input is the \textbf{input offset voltage}.
+
+\begin{booktable}{@{}LLl@{}}
+  \thead{Source} & \thead{Size} & \thead{Input-referred offset} \\
+  \midrule
+  1 mV of $V_{BE}$ mismatch & typical of two discrete devices & \textbf{1 mV}, directly \\
+  1 per cent of $R_C$ mismatch & ordinary resistors & 0.52 mV \\
+  20 microamps of base current through a 10 kilohm source imbalance &  & \textbf{200 mV} \\
+\end{booktable}
+
+\textbf{The third row is not a misprint, and it dominates the others by two orders of magnitude.} 20 microamps through 10 kilohm is 200 mV, and it cancels only if the two sources match.
+
+\textbf{The classical fix is to make the source resistances equal,} so the base currents produce the same voltage and it becomes common-mode: hence the resistor textbook op-amp circuits put in the non-inverting input. It leaves the \emph{difference} between the base currents, and a 1 per cent beta mismatch is 0.2 microamps, 2 mV through 10 kilohm.
+
+\textbf{The modern fix is to have no base current.} A MOSFET gate draws nothing, so the row disappears rather than being cancelled, and with it the requirement that the sources match.
+
+\textbf{The trade, plainly:} a MOSFET input pair has a tenth of the gain at the same current, $r_s$ being ten times $r_e$ (\secref{c7:sec:b6}), and none of the input-current problem. \textbf{Almost every modern operational amplifier takes that trade} and recovers the gain in the second stage. The third option, best of both for two more devices, is \textbf{bipolar inputs with source followers in front of them}.
+
+\subsection{What to build}
+\label{c9:sec:b7}
+
+\subsubsection{\code{ael/diffpair/pair.hpp}}
+\begin{booktable}{@{}LL@{}}
+  \thead{Function} & \thead{Returns} \\
+  \midrule
+  \code{intrinsicEmitterResistance(tailCurrent)} & $V_T/(I_{tail}/2)$. \textbf{Half} the tail. \\
+  \code{differentialGain(load, tailCurrent, degeneration)} & $-R_C/(2(r_e + R_E))$, single-ended. \\
+  \code{commonModeGain(load, tailCurrent, tailResistance, degeneration)} & $-R_C/(2R_{tail} + r_e + R_E)$. \\
+  \code{commonModeRejection(load, tailCurrent, tailResistance, degeneration)} & The ratio, as a plain number. \\
+  \code{commonModeRejectionDifferential(tailCurrent, tailResistance, mismatch)} & \secref{c9:sec:b5}'s figure, for both collectors. \\
+  \code{mirrorGain(tailCurrent, load)} & $-R_{load}/r_e$: no factor of two. \\
+  \code{transfer(differentialInput, tailCurrent)} & $I_{tail}\tanh(v_d/2V_T)$. \\
+  \code{linearRange(tolerance)} & The input at which \code{transfer} falls \code{tolerance} below its tangent. \\
+  \code{inputOffset(loadMismatch, vbeMismatch, load, tailCurrent)} & Input-referred, from both causes. \\
+  \code{decibels(ratio)} & $20\log_{10}$, because every figure above is quoted both ways. \\
+\end{booktable}
+
+\textbf{\code{commonModeRejection} must be implemented as the ratio of the other two,} not as a separate formula. The chapter's central claim is that $R_C$ cancels out of that ratio, and a shipped test asks for the rejection at two very different loads and requires agreement to machine precision.
+
+\textbf{\code{linearRange} must not have the tail current as a parameter.} If your derivation produced one, it has a factor that should have cancelled.
+
+\subsubsection{What good looks like}
+About sixty lines, of which \code{linearRange} is the only one that iterates.
+
+\subsection{What this section is blind to}
+\label{c9:sec:b8}
+\begin{itemize}
+  \item \textbf{Temperature.} One temperature, both halves at it. Offset drifts about 3 microvolts per degree per millivolt of offset, the specification that matters in a precision amplifier.
+  \item \textbf{The mirror's own mismatch,} which appears directly as offset and is why the mirror devices are matched as carefully as the input pair.
+  \item \textbf{Noise,} the main reason to choose one pair over another in practice.
+  \item \textbf{Common-mode input range.} The pair stops working as the inputs approach either rail, and the tail source needs a volt or two of its own.
+  \item \textbf{Frequency, again.} The mirror adds a pole the resistive load does not.
+\end{itemize}

@@ -1,0 +1,44 @@
+% Section 4.3, from lectures/L04/README.md: the objectives, the questions,
+% the further reading, and what the next chapter does with all of it.
+
+
+\section{Review}
+\label{c4:sec:review}
+
+\needspace{6\baselineskip}
+\subsection*{What you should be able to do now}
+After this chapter, you should be able to:
+\begin{itemize}
+  \item Compute the loop gain of any of Chapter~\ref{c3:ch:filters}'s configurations, and the gain error that follows.
+  \item Say how much open-loop gain a stated accuracy needs, and notice when the answer is unreasonable.
+  \item State what feedback does to input impedance, output impedance and distortion, with the direction right in each case.
+  \item Convert between gain-bandwidth product, closed-loop gain and closed-loop bandwidth.
+  \item Say what a Sallen-Key section buys over two cascaded RC sections with a buffer between them.
+  \item Write down the diode equation, and say what a 60 mV change of its voltage does.
+  \item Explain why plain Newton-Raphson fails on a diode from a cold start, and what a simulator does about it.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Questions to test yourself}
+You should be able to answer:
+\begin{enumerate}
+  \item An amplifier has $10^5$ of open-loop gain. You use it at a closed-loop gain of 1000. What is the gain error, and is that amplifier a good choice?
+  \item Feedback divides distortion by $1 + T$. What distortion remains, and why can it not be removed by more feedback?
+  \item Two amplifiers have the same gain-bandwidth product. One is used at a gain of 10 and one at 100. Which has more loop gain at 10 kHz, and by how much?
+  \item Negative feedback becomes positive when the loop phase reaches 180 degrees. How many first-order poles does it take to get there, and what does that say about how many stages a loop can have?
+  \item A diode carries 1 mA at 0.65 V. What voltage does it need for 10 mA? For 1 microamp?
+  \item Why does a nonlinear solver need a convergence criterion at all, when a linear one just solves?
+  \item Your Newton-Raphson loop converges in 6 iterations on one circuit and 400 on another that differs only in a resistor value. What is different about the second one?
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\subsection*{Further reading}
+\begin{itemize}
+  \item \emph{The Art of Electronics}, Horowitz and Hill, chapter 4, for feedback, and chapter 1 for the diode.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Looking ahead}
+\begin{itemize}
+  \item Chapter~\ref{c5:ch:transistor} begins Part~2. The transistor as a device with an exponential, a current gain and a saturation voltage, and with as little semiconductor physics as can be managed.
+\end{itemize}

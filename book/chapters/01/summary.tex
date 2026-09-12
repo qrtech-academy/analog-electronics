@@ -1,0 +1,44 @@
+% Section 1.3, from lectures/L01/README.md: the objectives, the questions,
+% the further reading, and what the next chapter does with all of it.
+
+
+\section{Review}
+\label{c1:sec:review}
+
+\needspace{6\baselineskip}
+\subsection*{What you should be able to do now}
+After this chapter, you should be able to:
+\begin{itemize}
+  \item State the sign convention this book uses, and say what breaks if it is inverted.
+  \item Compute a divider's output, its Thevenin resistance, and its output under any load, by hand.
+  \item Say why a 10 kilohm load on a 33k/6.8k divider is not a light load.
+  \item Write the node equation for any node in a resistive network without deriving it from scratch.
+  \item Stamp a resistor, a current source and a voltage source into a matrix.
+  \item Explain why a voltage source needs an extra unknown, and what that unknown is.
+  \item Implement \code{ael::net} and \code{ael::mna} against the shipped suite.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Questions to test yourself}
+You should be able to answer:
+\begin{enumerate}
+  \item A divider made of 1 megohm and 1 megohm, and one made of 10 ohms and 10 ohms, have the same ratio. What is different about them, and which would you put on an oscilloscope probe?
+  \item Why is a divider's Thevenin resistance the same whichever leg you call the upper one?
+  \item Nodal analysis gives one equation per node. A network has five nodes. How many unknowns are there, and why is it not five?
+  \item You stamp a resistor between two nodes and get four matrix entries. Two are positive and two are negative. Which are which, and what would swapping them mean physically?
+  \item A voltage source between two nodes cannot be written as a conductance. Why not, and what does the extra row in the matrix say?
+  \item Your solver returns node voltages that are all zero for a network you know is live. Name two causes, and say which one the shipped suite catches.
+  \item Superposition says two sources add. Your solver never mentions superposition. Why does it hold anyway, and in which chapter does it stop holding?
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\subsection*{Further reading}
+\begin{itemize}
+  \item \emph{The Art of Electronics}, Horowitz and Hill, chapter 1, for a second treatment of the same material at roughly the same level.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Looking ahead}
+\begin{itemize}
+  \item Chapter~\ref{c2:ch:reactance} makes the solver complex, which is the whole of the frequency domain and costs about thirty lines. Reactance, phasors, and the Bode plot as two straight lines and a corner.
+\end{itemize}

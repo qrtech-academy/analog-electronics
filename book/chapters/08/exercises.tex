@@ -1,0 +1,118 @@
+% Section 8.5, from lectures/L08/appendix/d_exercises.md. The worked solutions are not
+% printed; the aside says where they are.
+
+\section{Exercises}
+\label{c8:sec:exercises}
+
+Eight, ending with the Cross-check. That one retires a model this book has used since Chapter~\ref{c5:ch:transistor}, at the exact calculation where it stops working.
+
+\begin{aside}
+\textbf{How to check your work.} A \kindtag{Code} exercise is judged by the suite that ships with it: run \code{make test} at the root of the companion repository, with \code{AEL_DIR} pointing at your toolkit. A suite you have not started is reported as \code{SKIP} rather than as a failure, so the command is worth running from the first day. The hand calculations and designs are checked against the toolkit functions each one names.
+
+\textbf{The solutions are not in this book.} They are published in full in the companion repository, in \file{lectures/L08/appendix}, including the plausible wrong answer where there is one. Read them once you have your own answers, including the ones you are unsure about, because being unsure and right is a different thing from being unsure and wrong and the solutions say which is which.
+\end{aside}
+
+Nothing here is set on \secref{c8:app:c}, which is reading.
+
+% ------------------------------------------------------------------
+\recall{The stage that does nothing}
+\label{c8:ex:1}
+\begin{enumerate}
+  \item Write the follower's gain, input resistance and output resistance.
+  \item The gain is always less than one. Where does the missing part go, and what is the only lever on it?
+  \item Which two of those three results depend on $h_{FE}$?
+  \item A follower has no voltage gain. Name two distinct things it is nevertheless used for.
+\end{enumerate}
+
+% ------------------------------------------------------------------
+\recall{The three classes}
+\label{c8:ex:2}
+\begin{enumerate}
+  \item Define class A, class B and class AB by what conducts when.
+  \item Give the maximum theoretical efficiency of class A and of class B.
+  \item What is crossover distortion, how wide is the band it occupies, and why is it more objectionable than its percentage suggests?
+  \item Class B has better efficiency and worse distortion than class AB. What does class AB give up to get the distortion back?
+\end{enumerate}
+
+% ------------------------------------------------------------------
+\handcalc{A follower at three currents}
+\label{c8:ex:3}
+An emitter follower drives an 8 ohm loudspeaker. $\beta = 50$.
+
+\begin{enumerate}
+  \item Its gain at 1 mA, at 10 mA and at 120 mA.
+  \item Its output resistance at each, driven from a 1 kilohm source.
+  \item The resistance looking into its base at each.
+  \item One of the three columns is nearly constant. Which, and why?
+\end{enumerate}
+\checkyourself{\code{gain}, \code{outputResistance}, \code{inputResistance}}
+
+% ------------------------------------------------------------------
+\handcalc{What the loudspeaker costs}
+\label{c8:ex:4}
+The Chapter~\ref{c7:ch:smallsignal} stage: gain 38.5, output resistance 9.89 kilohm.
+
+\begin{enumerate}
+  \item Its gain driving 8 ohm directly.
+  \item Its gain driving a follower biased at 120 mA, which drives the 8 ohm.
+  \item The same with a Darlington in place of the follower.
+  \item Repeat part 3 with $\beta = 20$ and with $\beta = 200$, and say in one sentence what that spread means for the design.
+  \item A Darlington's effective emitter resistance is twice a single transistor's, and $h_{FE}$ does not appear in that statement. Derive it.
+\end{enumerate}
+\checkyourself{\code{loadedGain}, \code{inputResistance}, \code{darlingtonInputResistance}}
+
+% ------------------------------------------------------------------
+\design{A class-AB output stage}
+\label{c8:ex:5}
+A stage is to idle at 100 mA and drive 8 ohm from $\pm 25$ V rails.
+
+\begin{enumerate}
+  \item Size the emitter resistors by the 26 mV rule, and choose E12 values.
+  \item State the emitter factor you have bought and what fraction of the load your resistors now are.
+  \item Compute the bias voltage the stage needs, from the exponential rather than from 0.65 V.
+  \item State the maximum sine power into 8 ohm, ignoring saturation. Then say what you would actually specify the amplifier at, and why the two differ.
+\end{enumerate}
+\checkyourself{\code{degenerationResistor}, \code{biasVoltage}, \code{nearest_e12}}
+
+% ------------------------------------------------------------------
+\design{Thermal}
+\label{c8:ex:6}
+The stage from Exercise~\ref{c8:ex:5}, with the bias generator held at a fixed voltage.
+
+\begin{enumerate}
+  \item The fractional change in idle current per degree.
+  \item What the idle current becomes after a 30 degree rise, if nothing tracks.
+  \item Recompute part 1 with the emitter resistors removed, and state what they bought.
+  \item State where the bias generator must be mounted and what it is doing there. One sentence.
+\end{enumerate}
+\checkyourself{\code{driftPerDegree}}
+
+% ------------------------------------------------------------------
+\codeexercise{The follower and the output stage}
+\label{c8:ex:7}
+Implement \code{ael::follower} and \code{ael::output} to the specification in \secref{c8:sec:b7}.
+
+\textbf{\code{idleCurrent} may not use a constant base-emitter drop.} It is the inverse of an equation with an exponential and a linear term in it and they do not separate. Bisect in the logarithm, or use the Newton iteration with the step limiter you wrote in Chapter~\ref{c4:ch:feedback}. A version that assumes 0.65 V will pass one test in the shipped suite and fail four.
+
+% ------------------------------------------------------------------
+\crosscheck{The bias voltage a class-AB stage actually needs}
+\label{c8:ex:8}
+The stage of \secref{c8:sec:b3}: two complementary followers, 0.22 ohm emitter resistors, idling at 120 mA. Find the bias voltage between the two bases, three ways.
+
+\begin{enumerate}
+  \item \textbf{By hand, with the constant-drop model.} Two base-emitter drops at 0.65 V, plus the two resistor drops.
+  \item \textbf{By hand, with the exponential.} $V_{BE} = V_T \ln(I_C/I_S)$ at the idle current, plus the two resistor drops.
+  \item \textbf{By your solver.} You do not need a PNP model for this. \textbf{At idle the stage is symmetric}: no current flows in the load, the output node sits at zero, and each device carries the same current from half the bias voltage. So simulate one half, an NPN with its base held at $V_{bias}/2$ and its emitter resistor returned to ground, and bisect on that base voltage until the collector current is 120 mA.
+\end{enumerate}
+Then run it backwards, which is where the size of the disagreement shows: \textbf{apply leg 1's answer to the real stage and ask your solver what idle current results.}
+
+\task{What to expect}
+\textbf{Legs 2 and 3 agree to about 1 per cent}, at 1.619 and 1.604 V. \textbf{Leg 1 gives 1.353 V}, a quarter of a volt below both.
+
+\textbf{And 1.353 V applied to the stage gives an idle current of two or three milliamps, not 120.} A factor of about fifty. The stage is in class B, the dead band is open, and every quiet passage is distorted.
+
+\textbf{Legs 2 and 3 differ by 14 mV and their idle currents differ by 31 per cent.} Say why, and note that it is the same effect the exercise is about, one order of magnitude down.
+
+\textbf{Explain, in your own words, why a model that was worth 1 per cent in Chapter~\ref{c5:ch:transistor} and 12 per cent in Chapter~\ref{c6:ch:bias} is worth a factor of fifty here.} The answer is in what is being computed, not in the model.
+
+\textbf{If your leg 3 needs no adjustment to reach 120 mA}, your solver's transistor is using a constant drop somewhere, and you have measured leg 1 twice.

@@ -1,0 +1,122 @@
+% Section 5.4, from lectures/L05/appendix/c_exercises.md. The worked solutions are not
+% printed; the aside says where they are.
+
+\section{Exercises}
+\label{c5:sec:exercises}
+
+Eight, ending with the Cross-check. This one is the first in the book where both computational legs agree with each other and both are wrong about a real device, and saying so is the exercise.
+
+\begin{aside}
+\textbf{How to check your work.} A \kindtag{Code} exercise is judged by the suite that ships with it: run \code{make test} at the root of the companion repository, with \code{AEL_DIR} pointing at your toolkit. A suite you have not started is reported as \code{SKIP} rather than as a failure, so the command is worth running from the first day. The hand calculations and designs are checked against the toolkit functions each one names.
+
+\textbf{The solutions are not in this book.} They are published in full in the companion repository, in \file{lectures/L05/appendix}, including the plausible wrong answer where there is one. Read them once you have your own answers, including the ones you are unsure about, because being unsure and right is a different thing from being unsure and wrong and the solutions say which is which.
+\end{aside}
+
+% ------------------------------------------------------------------
+\recall{The device in three facts}
+\label{c5:ex:1}
+\begin{enumerate}
+  \item State the collector current as a function of base-emitter voltage, and name the other component in this book that obeys the same equation.
+  \item What does 60 mV of extra base-emitter voltage do to the collector current?
+  \item What is the incremental resistance of the base-emitter junction at 1 mA, and what will that quantity be called from Chapter~\ref{c7:ch:smallsignal}?
+  \item Give the emitter current in terms of the collector current for $\beta = 50$, and say what error is made by treating them as equal.
+\end{enumerate}
+
+% ------------------------------------------------------------------
+\recall{The three regions}
+\label{c5:ex:2}
+\begin{enumerate}
+  \item Name the three regions used, in terms of which junction is forward biased.
+  \item Which region does an amplifier live in, and which two does a switch use?
+  \item A MOSFET's \emph{saturation} region and a BJT's \emph{saturation} region are opposite conditions. Describe each, and say which BJT region corresponds to a MOSFET's saturation.
+  \item In the active region a transistor is a current source; in saturation it is a resistor. Which fact does a load line rely on, and which does a switch rely on?
+\end{enumerate}
+
+% ------------------------------------------------------------------
+\handcalc{Bias points from voltages}
+\label{c5:ex:3}
+A transistor has $I_S = 10^{-14}$ A, $\beta_F = 50$.
+
+\begin{enumerate}
+  \item What base-emitter voltage gives 1 mA of collector current?
+  \item What gives 10 mA? What gives 10 microamps?
+  \item For each of the three, what is the base current, and the emitter current?
+  \item Sketch the relationship between $V_{BE}$ and $\log I_C$. What is its slope, in volts per decade?
+\end{enumerate}
+\checkyourself{\code{currents}}
+
+% ------------------------------------------------------------------
+\handcalc{Is it saturated}
+\label{c5:ex:4}
+For each of these, classify the region and justify it in one sentence.
+
+\begin{narrowtable}{@{}llll@{}}
+  \thead{} & \thead{$V_B$} & \thead{$V_C$} & \thead{$V_E$} \\
+  \midrule
+  a & 0.0 V & 5.0 V & 0.0 V \\
+  b & 0.7 V & 3.0 V & 0.0 V \\
+  c & 0.8 V & 0.1 V & 0.0 V \\
+  d & 2.7 V & 5.0 V & 2.0 V \\
+  e & 0.7 V & 0.0 V & 0.0 V \\
+\end{narrowtable}
+
+\checkyourself{\code{region}}
+
+% ------------------------------------------------------------------
+\design{A relay driver}
+\label{c5:ex:5}
+A microcontroller pin at 3.3 V must switch a relay coil drawing 150 mA from a 12 V supply.
+
+\begin{enumerate}
+  \item Choose a forced beta and justify it.
+  \item Compute the base resistor, and choose an E12 value.
+  \item State the base current your choice actually delivers, and the resulting forced beta.
+  \item The transistor's $h_{FE}$ is specified as 100 minimum. Does your design depend on that number? Say what would have to be true for it to stop working.
+  \item The relay coil is inductive. State what that does when the transistor turns off, and what one component fixes it. You are not asked to size it.
+\end{enumerate}
+\checkyourself{\code{baseResistor}, \code{nearest_e12}}
+
+% ------------------------------------------------------------------
+\codeexercise{The two device models}
+\label{c5:ex:6}
+Implement \code{ael::device::bjt} and \code{ael::device::mosfet} to the specification in \secref{c5:sec:b4}.
+
+The BJT model has no branch on region: write the transport expressions and let saturation happen. If your code tests which region it is in before deciding what to compute, you have written three models rather than one, and the seams will show as discontinuities in Chapter~\ref{c6:ch:bias}.
+
+The MOSFET does need its three cases, because the square law genuinely is piecewise.
+
+% ------------------------------------------------------------------
+\codeexercise{The transistor in the netlist}
+\label{c5:ex:7}
+Add \code{addBjt} and stamp it in \code{ael::nr::solve}.
+
+A BJT contributes nine matrix entries: two junction conductances and one controlled source. Take the derivatives of the two transport expressions with respect to both junction voltages, and stamp them as a two-port conductance matrix plus two equivalent current sources.
+
+\textbf{Apply the step limiting to both junction voltages.} Chapter~\ref{c4:ch:feedback}'s circuit had one junction and would converge without it in 170 iterations; this one has two, and without limiting it does not converge at all. That is the failure Chapter~\ref{c4:ch:feedback} predicted.
+
+Confirm it converges in under twenty iterations on the switch of \secref{c5:sec:a4}.
+
+% ------------------------------------------------------------------
+\crosscheck{The switch, and the model that agrees with itself}
+\label{c5:ex:8}
+The switch of \secref{c5:sec:a4}: 5 V logic through 470 ohm into the base, 50 ohm from the collector to a 5 V rail, emitter grounded. Find the collector current.
+
+\begin{enumerate}
+  \item \textbf{By hand, with the saturation-voltage model.} Assume the transistor saturates at 0.2 V and the collector current is whatever the load resistor allows.
+  \item \textbf{By hand, with the transport model.} Solve the two junction equations for $V_{BE}$ and $V_{CE}$.
+  \item \textbf{By your solver.} \code{ael::nr::solve} on the four-element netlist.
+\end{enumerate}
+Then answer the question the three numbers raise: \textbf{which of them would a bench agree with?}
+
+\task{What to expect}
+\textbf{Legs 2 and 3 agree to five or six significant figures}, at 98.9 mA and a collector-emitter voltage of 57 mV. They are the same model solved two ways.
+
+\textbf{Leg 1 gives 96.0 mA}, about 3 per cent lower, because it assumed 0.2 V across the transistor rather than 57 mV.
+
+\textbf{And leg 1 is the one closer to a real device.} A small-signal transistor at 100 mA saturates somewhere near 0.2 V, not near 0.06 V. The transport model has no bulk resistance in it: no resistance in the collector material, none in the emitter, none in the bond wires. Those are what produce most of a real saturation voltage at 100 mA, and the model omits all of them.
+
+\textbf{This is the first Cross-check where agreement between the legs is not evidence of being right.} Legs 2 and 3 agree because they are the same physics evaluated twice. What they agree on is optimistic by a factor of three in the saturation voltage, and a design that budgeted its heat from 57 mV would run three times hotter than predicted.
+
+\textbf{What to do about it.} Nothing, in this book, except know it. The correction is a series resistance in the model, of a few tenths of an ohm, and it is the first thing a real simulator's transistor model has that this one does not. What matters is the habit: \textbf{two legs agreeing tells you your arithmetic is right, and says nothing whatever about whether your model contains the physics that decides the answer.}
+
+\textbf{Sensitivity, which is the design's real claim.} Repeat leg 3 with $\beta_F$ set to 300 and then to 40. The collector current changes by less than a fifth of a per cent, because the design never used beta. Now set it to 8, below the forced beta of 11, and the transistor leaves saturation: the current falls to 72 mA and the collector sits at 1.4 V. \textbf{That is the boundary the forced-beta method buys margin against}, and it is three decades away from any real device.

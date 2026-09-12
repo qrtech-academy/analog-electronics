@@ -1,0 +1,52 @@
+% Chapter 10, typeset from lectures/L10. The capstone.
+
+\chapter{Building an operational amplifier, and the capstone}
+\label{c10:ch:amplifier}
+
+{\large\itshape The black box of Chapter~3, opened and rebuilt from the six chapters since.\par}
+
+\begin{chapterbox}{In this chapter}
+\begin{itemize}
+  \item The black box of Chapter~\ref{c3:ch:filters}, opened: eleven transistors, and every one of
+    them already analysed.
+  \item What each stage is responsible for, and why that is the only way to size any of them.
+  \item The gain budget, and the eleven decibels that loading takes.
+  \item The two stages with no voltage gain, which are worth 31 dB each.
+  \item Why the amplifier has no open-loop operating point at all, and what that means for the
+    solver.
+  \item Miller compensation: making one pole dominant on purpose.
+  \item Closing the loop, and Chapter~\ref{c4:ch:feedback}'s arithmetic arriving where it was
+    always going.
+  \item The capstone: one program, every stage predicted and solved, printed side by side.
+\end{itemize}
+\end{chapterbox}
+
+\textbf{Everything in this chapter is already built.} The pair is Chapter~\ref{c9:ch:diffpair}, the
+mirror is Chapter~\ref{c7:ch:smallsignal}, the followers are Chapter~\ref{c8:ch:follower}, and the
+gain stage is Chapter~\ref{c7:ch:smallsignal} again. This chapter adds no new circuit; it adds the
+\textbf{accounting}, and the accounting is where the surprises are.
+
+There are three of them. The first is the \textbf{budget}: two stages of 65.7 dB should give 131,
+and the amplifier delivers 120, with 10.6 of the missing 11.5 in one place --- the gain stage
+driving the output stage, and that is \emph{after} the output stage was made a Darlington. This is
+Chapter~\ref{c1:ch:circuits}'s loading for the sixth and last time. The second is that \textbf{the
+two stages with no voltage gain are the most valuable in the amplifier}: they are six of the eleven
+transistors, they amplify nothing, and each is worth about 31 dB. Gain is easy; connecting two
+stages together is what is hard.
+
+The third is that \textbf{the amplifier has no open-loop operating point}. A gain of a million and
+rails of $\pm 15$ V means that 15 microvolts of input offset puts the output against a rail, and no
+pair of transistors matches to 15 microvolts. A solver that reports the output at $-15$ V has not
+failed, and a stage that cannot be biased on its own is not a stage --- it is part of a loop.
+
+Then close the loop, and Chapter~\ref{c4:ch:feedback}'s arithmetic arrives where it was always
+going: 120 dB open, a gain of 20 closed, an error of 0.002 per cent, and a closed-loop gain that
+moves by nine parts in a hundred thousand while the open-loop gain moves by a factor of fourteen.
+The capstone in \secref{c10:sec:exercises} is one program that predicts the whole amplifier, solves
+the whole amplifier, and reconciles the two row by row. \textbf{The differences are the book}, and
+a reader who can account for every row has understood the ten chapters.
+
+\input{chapters/10/amplifier}
+\input{chapters/10/budget}
+\input{chapters/10/summary}
+\input{chapters/10/exercises}

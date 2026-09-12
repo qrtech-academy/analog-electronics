@@ -1,0 +1,89 @@
+% Section 7.1, from lectures/L07/appendix/a_the_small_signal_model.md.
+
+\section{The small-signal model, and the three results}
+\label{c7:app:a}
+
+The centre of the book. One resistance, one construction, three results, and the same method every time.
+
+\subsection{A straight line through a curve}
+\label{c7:sec:a1}
+An amplifier does not use the whole exponential. It sits at an operating point, found in Chapter~\ref{c6:ch:bias}~(Chapter~\ref{c6:ch:bias}), and the signal moves it a little way either side. \textbf{Over a small enough excursion, any smooth curve is a straight line,} and that slope is the whole small-signal model.
+
+\[
+  g_m = \left.\frac{dI_C}{dV_{BE}}\right|_{Q} = \frac{I_C}{V_T}
+\]
+
+\textbf{How small is small enough.} The exponential's scale is $V_T$, 26 mV, so a few millivolts is linear to a fraction of a per cent and 26 mV is not linear at all. \textbf{A stage handling 10 mV of base signal is already distorting noticeably,} and that is the mechanism Chapter~\ref{c4:ch:feedback}'s feedback divided down.
+
+\textbf{What linearising discards:} clipping, distortion, the fact that the device turns off, and any signal large enough to move the operating point.
+
+\subsection{The one resistance}
+\label{c7:sec:a2}
+\[
+  r_e = \frac{V_T}{I_C} = \frac{26\ \text{mV}}{I_C}
+\]
+
+At 1 mA it is 26 ohm.
+
+\textbf{It is not a resistor.} It is the slope of the device's own exponential at the operating point, depending on nothing but current and temperature. It cannot be bought or specified, and if the stage is switched off it does not become large: it ceases to exist with the operating point.
+
+This book uses it in preference to $g_m$ throughout, a resistance in series with the emitter being easier to reason about than a transconductance. The translation is $g_m = 1/r_e$.
+
+\subsection{Building the small-signal schematic}
+\label{c7:sec:a3}
+Four rules, applied in order:
+
+\begin{enumerate}
+  \item \textbf{Every DC source becomes a short to ground.} A rail that does not move carries no signal.
+  \item \textbf{Every coupling and bypass capacitor becomes a short.} That is what they were chosen for.
+  \item \textbf{The bias network disappears} wherever it is now in parallel with something much smaller.
+  \item \textbf{The transistor becomes $r_e$ from base to emitter, and a current source from collector to emitter} carrying the current that $r_e$ passes.
+\end{enumerate}
+\bookfigure{lectures/L07/appendix/images/re_model.png}{The small-signal schematic of a common-emitter stage: the input drives $r_e$ in series with the emitter resistor to ground, and on the output side the supply rail is drawn as a ground with the collector resistor descending to the output node, where a current source draws the collector current to ground.}{c7:fig:remodel}
+
+The result has no transistor in it: one resistance, one current source, the external resistors. \textbf{The one equation} links its halves, that the current the input drives through $r_e$ and $R_E$ \emph{is} the current the collector source delivers. Everything else is bookkeeping.
+
+\subsection{Three results, one method}
+\label{c7:sec:a4}
+\textbf{Gain.} The input drives $v_{in}/(r_e + R_E)$ through the emitter branch; that current comes out of the collector and through $R_C$, giving $-i R_C$ at the output.
+
+\[
+  A_v = -\frac{R_C}{r_e + R_E}
+\]
+
+The minus sign is real: more base voltage means more collector current means a lower collector voltage. For 10 kilohm and 1 mA with no emitter resistor that is $-385$; with 234 ohm, $-38.5$.
+
+\textbf{Input resistance.} The base draws the emitter current divided by $\beta$, at the voltage across the emitter branch:
+
+\[
+  Z_{in(base)} = \beta\,(r_e + R_E)
+\]
+
+At 1 mA with 234 ohm and $\beta = 50$, 13 kilohm. \textbf{This is the one result in Part~2 that depends on beta,} as \secref{c5:sec:a2} warned, so an input resistance is always a range. The stage's actual input resistance is that in parallel with the bias divider, usually the smaller of the two.
+
+\textbf{Output resistance} is the subject of \secref{c7:app:b}, because it is the one result here that the obvious answer gets wrong.
+
+\subsection{What the emitter resistor does to the gain}
+\label{c7:sec:a5}
+Dividing the two gain expressions:
+
+\[
+  \frac{A_v(\text{no } R_E)}{A_v(\text{with } R_E)} = \frac{r_e + R_E}{r_e}
+\]
+
+That ratio is the \textbf{emitter factor}, and the gain falls by exactly it.
+
+\bookfigure{lectures/L07/appendix/images/gain_against_ef.png}{Gain and the emitter factor plotted against the emitter resistor on logarithmic axes, the gain falling as the factor rises and the two crossing, with the 234 ohm design point marked where the gain of 385 has become 38.5.}{c7:fig:gainagainstef}
+
+\textbf{An emitter resistor costs gain one for one.} What it buys was Chapter~\ref{c6:ch:bias}'s subject, thermal stability, and what else it buys is \secref{c7:app:b}'s.
+
+\textbf{Bypassing it} with a capacitor recovers the gain at signal frequencies while keeping the DC stability, which is why almost every discrete common-emitter stage has one. \textbf{It also throws away the distortion reduction,} because that was feedback and the capacitor removed it at exactly the signal frequencies.
+
+\subsection{What this section is blind to}
+\label{c7:sec:a6}
+\begin{itemize}
+  \item \textbf{Everything nonlinear.} Distortion, clipping and slew rate are outside a model built by assuming a straight line.
+  \item \textbf{Capacitance.} Nothing here has a frequency in it. The Miller effect of \secref{c7:sec:b5} is where that starts.
+  \item \textbf{The Early effect}, so far. $r_o$ arrives in \secref{c7:sec:b2} and changes the output resistance results and nothing else.
+  \item \textbf{Noise.} The model says what a stage does to a signal, not what signal the stage adds itself.
+\end{itemize}

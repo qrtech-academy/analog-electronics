@@ -1,0 +1,49 @@
+% Chapter 2, typeset from lectures/L02.
+
+\chapter{Reactance, phasors, and frequency response}
+\label{c2:ch:reactance}
+
+{\large\itshape The frequency domain, arrived at by making the solver complex rather than by
+deriving a transform.\par}
+
+\begin{chapterbox}{In this chapter}
+\begin{itemize}
+  \item The capacitor and the inductor as devices that remember, and the time constant that says
+    how long for.
+  \item Sinusoidal steady state, and why a complex number can stand in for a sinusoid.
+  \item Impedance: resistance that depends on frequency, and the two stamps that follow from it.
+  \item Magnitude and phase, the decibel, and the Bode plot as two straight lines and a corner.
+  \item The phase, which is the half people skip and the half that decides stability.
+  \item The transformer, briefly, and where its model stops being true.
+  \item The complex stamps and \code{ael::ac}.
+\end{itemize}
+\end{chapterbox}
+
+A resistor's current depends on the voltage across it now. That is the whole of
+Chapter~\ref{c1:ch:circuits}. A capacitor's current depends on how the voltage has been
+\emph{changing}, and that one difference is this chapter. Two devices with memory turn a circuit
+from something with an answer into something with a trajectory, and the method of
+Chapter~\ref{c1:ch:circuits} cannot solve it.
+
+The way out is one observation rather than a transform. \textbf{In a linear circuit driven by a
+sinusoid, every voltage and current in it is a sinusoid at the same frequency}, so only amplitude
+and phase differ from node to node, and a single complex number carries exactly those two. Under
+that substitution differentiation becomes multiplication by $j\omega$, a capacitor becomes a
+conductance of $j\omega C$, and \textbf{nothing about the solver of Chapter~\ref{c1:ch:circuits}
+changes except its scalar type}. The frequency domain costs about thirty lines, and only because
+the first solver was written in a way that lets it.
+
+What you get for them is the ability to read a response: the corner, the two asymptotes, and the
+45 degrees of phase that are already there when the magnitude has barely moved. The magnitude says
+whether a loop has gain left; the phase says whether that gain helps or hurts, and
+Chapter~\ref{c4:ch:feedback} needs both.
+
+Work \secref{c2:app:a} for the physics and the phasor argument, then \secref{c2:app:b} for the
+stamps and the specification in \secref{c2:sec:b4}. The Cross-check that closes
+\secref{c2:sec:exercises} is the first in this book where two legs are expected to disagree, and by
+a factor of 6.6.
+
+\input{chapters/02/reactance}
+\input{chapters/02/solver}
+\input{chapters/02/summary}
+\input{chapters/02/exercises}

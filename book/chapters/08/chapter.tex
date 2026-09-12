@@ -1,0 +1,53 @@
+% Chapter 8, typeset from lectures/L08. Three theory sections rather than two: the third is
+% reading, and nothing is set on it.
+
+\chapter{Followers, and the output stage they turn into}
+\label{c8:ch:follower}
+
+{\large\itshape The stage with no voltage gain, and why almost every design has one.\par}
+
+\begin{chapterbox}{In this chapter}
+\begin{itemize}
+  \item The stage with no voltage gain, and why nearly every amplifier contains several.
+  \item Gain just under one, and the shortfall as a design quantity rather than a rounding error.
+  \item Impedance transformation: $h_{FE}$ going in, $r_e$ coming out.
+  \item The 8 ohm problem, and the arithmetic that says one follower is not enough.
+  \item The Darlington, $h_{FE}^2$, and the price of leaning on beta.
+  \item Class A, class B, and the dead band between them.
+  \item Class AB, and the 26 millivolt rule that sizes the emitter resistors.
+  \item Why the bias diodes must be bolted to the same heatsink as the output devices.
+  \item The source follower, the body effect, and the one place $r_s$ does not carry across
+    cleanly.
+  \item Building \code{ael::follower} and \code{ael::output}.
+\end{itemize}
+\end{chapterbox}
+
+This chapter is Chapter~\ref{c7:ch:smallsignal}'s model applied at the emitter instead of the
+collector, and almost nothing in it is derived that was not derived there. A \textbf{follower} has
+a voltage gain of 0.97 and is the most-used circuit in the book, because everything it is for is in
+its two resistances rather than in its one gain: it shows the stage driving it $h_{FE}$ times what
+is on its emitter, and shows its load a source resistance $h_{FE}$ times smaller.
+
+The reason that matters is one calculation. Take the stage of Chapter~\ref{c7:ch:smallsignal},
+with a gain of 38.5 and an output resistance of 9.89 kilohm, and connect a loudspeaker: it delivers
+\textbf{0.08 per cent} of its gain and the amplifier does not work at all. One follower recovers
+4 per cent, which is fifty times better and still useless. A \textbf{Darlington} recovers 68.
+\textbf{That is the whole reason output stages exist}, and it is Chapter~\ref{c1:ch:circuits}'s
+loading arithmetic for the fifth time in this book.
+
+The second half sizes a real output stage. Two followers sharing the work have a dead band 1.3 V
+wide whose \emph{position}, not its width, is the problem; closing it costs a small idle current,
+and the rule that sets it makes the emitter factor exactly 2. Then two things that decide whether
+the stage survives: a thermal loop that can run away, whose fix is not a circuit change at all but
+where a component is bolted, and \textbf{the place where the constant-drop model finally
+breaks} --- not by a few per cent, as it has until now, but by a factor of sixty, for a reason that
+is about the calculation rather than about the model.
+
+\Secref{c8:app:c} is \textbf{reading, not examinable}: what a real power amplifier adds on top of
+everything here, and no exercise is set on it.
+
+\input{chapters/08/follower}
+\input{chapters/08/output}
+\input{chapters/08/power}
+\input{chapters/08/summary}
+\input{chapters/08/exercises}

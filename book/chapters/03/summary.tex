@@ -1,0 +1,44 @@
+% Section 3.3, from lectures/L03/README.md: the objectives, the questions,
+% the further reading, and what the next chapter does with all of it.
+
+
+\section{Review}
+\label{c3:sec:review}
+
+\needspace{6\baselineskip}
+\subsection*{What you should be able to do now}
+After this chapter, you should be able to:
+\begin{itemize}
+  \item Turn a filter requirement into a corner frequency, and say when one pole cannot meet it.
+  \item Compute what a filter's own input and output impedance are, and why both depend on frequency.
+  \item Say what two directly cascaded RC sections actually give, and by how much it differs from the answer that assumes they are independent.
+  \item State Q two ways: as the sharpness of a peak, and as the voltage multiplication inside it.
+  \item Apply the two op-amp rules to any of the standard configurations and get the gain in one line.
+  \item Say precisely which assumption each rule is, and name a circuit where each one fails.
+  \item Compute the two thresholds of a Schmitt trigger, and choose them for a given amount of noise.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Questions to test yourself}
+You should be able to answer:
+\begin{enumerate}
+  \item A low-pass and a high-pass built from the same R and C have the same corner. What is different about them at that corner, other than which side of it they pass?
+  \item You cascade two identical low-pass sections and measure the corner. Is it higher or lower than one section's corner, and by roughly what factor?
+  \item Adding a buffer between two filter sections changes the response. Which direction does the corner move, and why is that the direction that makes it predictable?
+  \item A band-pass made of one high-pass and one low-pass never quite reaches 0 dB in its passband. What decides how close it gets?
+  \item A filter has Q of 10 and you apply 5 V at resonance. What is the largest voltage anywhere in the circuit, and where is it?
+  \item The two op-amp rules assume infinite gain. Which of the two survives when the gain is 1000, and which one starts to leak?
+  \item A comparator with no hysteresis and a slowly rising noisy input produces a burst of output transitions. How much hysteresis stops it, and what does that hysteresis cost you?
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\subsection*{Further reading}
+\begin{itemize}
+  \item \emph{The Art of Electronics}, Horowitz and Hill, chapters 1 and 4, for passive filters and for the operational amplifier as a black box.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Looking ahead}
+\begin{itemize}
+  \item Chapter~\ref{c4:ch:feedback} asks why the two rules work at all. Feedback, the loop gain, what it buys and what it costs, and then the diode, which is the first device in the book that a phasor cannot describe.
+\end{itemize}

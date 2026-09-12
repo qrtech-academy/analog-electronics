@@ -1,0 +1,117 @@
+% Section 8.1, from lectures/L08/appendix/a_the_follower.md.
+
+\section{The follower, and the load it exists to survive}
+\label{c8:app:a}
+
+A stage with a voltage gain of one, and the arithmetic that makes it the most-used circuit in the book.
+
+\subsection{The same model, at the other terminal}
+\label{c8:sec:a1}
+A \textbf{follower} is Chapter~\ref{c7:ch:smallsignal}'s model~(\secref{c7:app:a}) with the output taken at the emitter instead of the collector, and no collector resistor.
+
+\bookfigure{lectures/L08/appendix/images/emitter_follower.png}{An emitter follower: an NPN transistor with its collector tied to the supply rail, its base driven from the input, and an emitter resistor to ground with the output taken at the emitter, annotated at both ends with what the stage does to impedance.}{c8:fig:emitterfollower}
+
+\begin{enumerate}
+  \item \textbf{The output is at the emitter}, not the collector.
+  \item \textbf{There is no collector resistor}, because a follower does not turn current into voltage.
+  \item In high-voltage work the collector is sometimes grounded rather than tied to the rail, which protects the device and changes nothing below.
+\end{enumerate}
+
+\subsection{Gain, and where the missing part went}
+\label{c8:sec:a2}
+The input drives $r_e$ and $R_E$ in series and the output is taken across $R_E$ alone: a divider.
+
+\[
+  G = \frac{R_E}{r_e + R_E}
+\]
+
+\textbf{Always less than one, and the shortfall is $r_e/(r_e + R_E)$.} At 1 mA into 10 kilohm, 0.997. At 120 mA into an 8 ohm loudspeaker, \textbf{0.974}.
+
+The ratio $r_e/R_E$ is the only thing a follower's gain depends on, and there is one lever on it, $r_e = V_T/I_C$. \textbf{The gain is a question about current and nothing else: a follower that is not good enough is a follower that is not biased hard enough.}
+
+\bookfigure{lectures/L08/appendix/images/follower_into_load.png}{Follower gain against quiescent current on a logarithmic axis, for an 8 ohm load and a 1 kilohm load, the 8 ohm curve climbing from about 0.03 at 100 microamps through 0.24 at 1 milliamp towards one, with the 120 milliamp design point marked.}{c8:fig:followerintoload}
+
+\textbf{Read the 8 ohm curve at 1 mA: the gain is 0.24.} Not 0.99, not 0.9, a quarter: $r_e$ is 26 ohm and the load is 8, so three quarters of the signal drops inside the transistor. That is why \secref{c8:app:b} exists, and why an output stage idles at 120 mA.
+
+\subsection{The two resistances, which are the point}
+\label{c8:sec:a3}
+\textbf{Looking into the base,} the base current is the emitter current divided by $h_{FE}$:
+
+\[
+  Z_{in} = h_{FE}\,(r_e + R_E)
+\]
+
+\textbf{Looking back into the emitter,} the transistor presents $r_e$ and whatever drives the base appears divided by $h_{FE}$:
+
+\[
+  Z_{out} = r_e + \frac{R_{source}}{h_{FE}}
+\]
+
+At 1 mA driven from 1 kilohm, $26 + 20 = 46$ ohm.
+
+\textbf{Together the stage is an impedance transformer:} it shows the driving stage $h_{FE}$ times its emitter load, and the load $h_{FE}$ times less than its source, at a signal gain of 0.97.
+
+\textbf{Both results are proportional to $h_{FE}$,} as \secref{c5:sec:a2} and \secref{c7:sec:a4} warned. \secref{c8:sec:a5} is where it starts to hurt.
+
+\subsection{The eight ohm problem}
+\label{c8:sec:a4}
+Take Chapter~\ref{c7:ch:smallsignal}'s stage: 1 mA, 10 kilohm collector, 234 ohm emitter, open-circuit gain 38.5, output resistance 9.89 kilohm. Connect a loudspeaker.
+
+\[
+  G_{loaded} = G \cdot \frac{R_{load}}{R_{out} + R_{load}} = 38.5 \times \frac{8}{9885 + 8}
+\]
+
+\textbf{0.031.} The stage keeps \textbf{0.08 per cent} of its gain, and the amplifier does not work at all.
+
+\bookfigure{lectures/L08/appendix/images/impedance_chain.png}{Gain kept against the resistance the driving stage sees, on a logarithmic axis, rising from nearly nothing at 8 ohms through 4 per cent at 411 ohms to 68 per cent at 20 kilohms, with a shaded band showing where the Darlington point moves as $h_{FE}$ runs from 20 to 200.}{c8:fig:impedancechain}
+
+\textbf{Now put a follower in between,} biased at 120 mA: $h_{FE}(r_e + R_{load}) = 411$ ohm, so the driving stage sees 411 instead of 8 and keeps \textbf{4 per cent}. \textbf{Fifty times better and still useless. One follower is not enough,} by two orders of magnitude.
+
+\subsection{The Darlington, and the price of beta squared}
+\label{c8:sec:a5}
+Two transistors, the first driving the base of the second, behave as one device with a current gain of $h_{FE1} h_{FE2}$ and two base-emitter drops. A.3's multiplication then happens twice:
+
+\[
+  Z_{in} = h_{FE}^2\,(2r_e + R_{load}) = 2500 \times 8.43 = 21.1\ \text{k}\Omega
+\]
+
+\textbf{The resistance the square multiplies is the pair's own $2r_e$,} not one device's. The input device runs at the output device's base current, so its $r_e$ is $h_{FE}$ times larger, and is seen through the output device's gain, contributing $r_e$ again. The two $h_{FE}$s cancel: \textbf{a Darlington's effective emitter resistance is exactly twice a single transistor's.} The driving stage now sees 21.1 kilohm against its own 9.89 and keeps \textbf{68 per cent}, which is why essentially every discrete output stage is a Darlington.
+
+\textbf{Now the bill.} At $h_{FE} = 20$ the input resistance is 3.4 kilohm and the stage keeps 25 per cent; at 200 it is 337 kilohm and keeps 97. \textbf{The same design from the same part number varies by nearly four in gain across an ordinary production spread.}
+
+That is a design \textbf{plus} something that removes the dependence, namely Chapter~\ref{c4:ch:feedback}'s feedback~(Chapter~\ref{c4:ch:feedback}): at a loop gain of a few hundred the closed-loop gain stops caring. Chapter~\ref{c10:ch:amplifier} builds the loop.
+
+\textbf{The Darlington's other costs,} real and not solved by feedback:
+
+\begin{itemize}
+  \item \textbf{Two base-emitter drops}, so the swing is 1.3 V short of each rail rather than 0.65.
+  \item \textbf{Slow turn-off}, the second base's charge having nowhere to go. A resistor from that base to the emitter is the standard fix, present in every practical circuit.
+  \item \textbf{Twice the thermal drift} in the bias, which \secref{c8:sec:b4} deals with.
+  \item \textbf{Twice the intrinsic emitter resistance}, so 0.949 into 8 ohms where one follower gives 0.974.
+\end{itemize}
+
+\subsection{The fifth time}
+\label{c8:sec:a6}
+The same arithmetic since Chapter~\ref{c1:ch:circuits}. This chapter is the fifth; Chapter~\ref{c10:ch:amplifier}~(Chapter~\ref{c10:ch:amplifier}) is the last:
+
+\begin{booktable}{@{}LLL@{}}
+  \thead{Where} & \thead{What loaded what} & \thead{Cost} \\
+  \midrule
+  \secref{c1:sec:a6} & 10 kilohm on a divider & a third of the output \\
+  Chapter~\ref{c2:ch:reactance}~(Chapter~\ref{c2:ch:reactance}) & source resistance on a filter & the corner moves 6.6 times \\
+  Chapter~\ref{c3:ch:filters}~(Chapter~\ref{c3:ch:filters}) & two filter sections on each other & the corner moves 1.72 times \\
+  \secref{c6:sec:a3} & base current on a bias divider & 12 per cent of $I_C$ \\
+  \textbf{This chapter, here} & \textbf{a loudspeaker on a voltage amplifier} & \textbf{99.92 per cent of the gain} \\
+  Chapter~\ref{c10:ch:amplifier}, when it is written & each stage on the one before & 11 dB of open-loop gain \\
+\end{booktable}
+
+\textbf{The subtraction is identical every time.} What changes is how much it costs, and here it costs everything.
+
+\subsection{What this section is blind to}
+\label{c8:sec:a7}
+\begin{itemize}
+  \item \textbf{Frequency.} A follower with a capacitive load and an inductive source can oscillate, which is what the base resistor in every real output stage is for.
+  \item \textbf{Large signals.} 0.974 is a small-signal number at one operating point. A follower driven at its rails runs out of current before voltage; \secref{c8:app:b} is the fix.
+  \item \textbf{The second transistor's operating point} in the Darlington: it runs at the first's base current, so its $r_e$ is fifty times larger. In the code, not in the arithmetic above.
+  \item \textbf{Power.} 120 mA at 20 V is 2.4 W, a heatsink question rather than a small-signal one.
+\end{itemize}

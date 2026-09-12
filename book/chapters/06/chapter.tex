@@ -1,0 +1,45 @@
+% Chapter 6, typeset from lectures/L06.
+
+\chapter{Biasing, and what an emitter resistor actually buys}
+\label{c6:ch:bias}
+
+{\large\itshape The quiescent point, and the first place the obvious argument needs correcting.\par}
+
+\begin{chapterbox}{In this chapter}
+\begin{itemize}
+  \item The quiescent point as three numbers, and the load line that constrains them.
+  \item Voltage-divider bias, and the base current that loads the divider you designed.
+  \item Stiffness: why the divider current must be much larger than the base current, and what
+    happens at the usual rule of thumb.
+  \item Thermal drift: the base-emitter voltage falling about 2 mV per degree, and what that does.
+  \item The emitter resistor as local feedback, and the drift divided by the emitter factor.
+  \item An argument that does not survive its own arithmetic, and the correct one.
+  \item The 220 mV rule, and the E12 value it lands on.
+  \item Building \code{ael::bias}, and adding temperature to the transistor model.
+\end{itemize}
+\end{chapterbox}
+
+An amplifier is a transistor sitting at an operating point with a signal moving it about. This
+chapter is the sitting still; Chapter~\ref{c7:ch:smallsignal} is the moving about. The
+construction is the load line of Chapter~\ref{c5:ch:transistor} used at a different place on it: a
+switch used the two ends, and an amplifier sits where there is room to move both ways.
+
+Divider bias has a surprise in it immediately. The divider that gives 1.71 V unloaded gives 1.60 V
+with a base hanging on it, and the collector current comes out 12 per cent below what the design
+said --- \textbf{Chapter~\ref{c1:ch:circuits}'s loading, for the fourth time}, and this time the
+arithmetic is self-referential, because the base current depends on the collector current which
+depends on the base voltage which depends on the base current.
+
+Then the problem worth solving. \textbf{At a fixed base voltage the collector current rises about
+8 per cent per degree}, which over a thirty-degree rise is a factor of ten: a stage biased at 1 mA
+on a bench at 20 degrees is at 10 mA inside an enclosure at 50, sitting hard against one end of its
+load line. The fix is an emitter resistor, and \textbf{there is a tempting explanation of what it
+does that does not survive its own numbers}. \Secref{c6:sec:b2} sets that argument out in full and
+then breaks it with one exponential; \secref{c6:sec:b3} gives the version that survives, which is
+Chapter~\ref{c4:ch:feedback}'s: the resistor is a local feedback loop, and it divides the drift by
+exactly the factor it costs in gain.
+
+\input{chapters/06/quiescent}
+\input{chapters/06/drift}
+\input{chapters/06/summary}
+\input{chapters/06/exercises}

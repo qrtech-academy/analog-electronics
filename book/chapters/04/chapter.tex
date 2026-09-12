@@ -1,0 +1,46 @@
+% Chapter 4, typeset from lectures/L04.
+
+\chapter{Feedback, active filters, and the diode}
+\label{c4:ch:feedback}
+
+{\large\itshape Why the ideal rules work, what they cost, and the first nonlinear device.\par}
+
+\begin{chapterbox}{In this chapter}
+\begin{itemize}
+  \item Loop gain, and the closed-loop gain written so the error term is visible.
+  \item Desensitisation: trading gain you have for accuracy you want.
+  \item What feedback does to input and output impedance, and in which direction.
+  \item Distortion divided by the loop gain, and the nonlinearity that always survives.
+  \item Gain-bandwidth product, and the stability limit that ends the free lunch.
+  \item Active filters, and the loading problem an amplifier solves for them.
+  \item The diode: the exponential, the 0.7 V approximation, and where it stops being one.
+  \item Newton-Raphson, and why plain Newton-Raphson does not work on a diode.
+  \item Building \code{ael::feedback}, \code{ael::device::diode} and \code{ael::nr}.
+\end{itemize}
+\end{chapterbox}
+
+Chapter~\ref{c3:ch:filters} asserted two rules and used them. This chapter derives them, and the
+derivation hands back an error term that says exactly how far from true they are.
+\textbf{One number decides everything}: the loop gain $T$. The gain error is $1/(1+T)$, distortion
+is divided by $1+T$, impedances are multiplied or divided by $1+T$. Learn $T$ and the rest is
+bookkeeping --- and learn what it costs, which is the gain you gave up and the bandwidth you did
+not get, because gain and bandwidth trade one for one and an amplifier is sold by their product.
+
+Feedback also stops working, and it is worth knowing where. Enough phase shift around the loop
+turns negative feedback positive and an amplifier into an oscillator; one pole can never get
+there, two only asymptotically, and three get there with gain to spare. That is why
+Chapter~\ref{c10:ch:amplifier}'s four-stage amplifier has a capacitor in it whose only job is to
+make the amplifier slow.
+
+The second half of the chapter introduces \textbf{the first device in this book that is not
+linear}. A diode has no phasor description, because it creates frequencies that were not in the
+excitation, and it cannot be solved in one pass, because its conductance depends on the answer. The
+machinery for that is Newton-Raphson: guess, linearise, solve with the linear solver you already
+have, repeat. \textbf{Every nonlinear simulator is that loop}, and the one detail that makes it
+work in practice --- damping a large step by taking it in the logarithm --- is the difference
+between seven iterations and a hundred and sixty-eight.
+
+\input{chapters/04/feedback}
+\input{chapters/04/diode}
+\input{chapters/04/summary}
+\input{chapters/04/exercises}

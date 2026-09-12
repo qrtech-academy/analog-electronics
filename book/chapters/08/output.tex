@@ -1,0 +1,162 @@
+% Section 8.2, from lectures/L08/appendix/b_the_output_stage.md.
+
+\section{The output stage, and the model that finally breaks}
+\label{c8:app:b}
+
+Three classes, one dead band, one sizing rule, and the first place in this book where the constant-drop model is not merely approximate but wrong by a factor of sixty.
+
+\subsection{Class A: the follower you already have}
+\label{c8:sec:b1}
+Bias the follower so it conducts for the whole signal. Nothing turns off, so there is no discontinuity in the transfer curve and the distortion is the exponential's curvature.
+
+\textbf{Its vice is arithmetic.} To swing $\pm V$ the device must idle at $V/R_{load}$, the current it must be able to \emph{stop} delivering at the negative peak, so it burns $V^2/R_{load}$ at idle. Best case \textbf{25 per cent efficiency at full output}, falling to zero as the signal falls: \textbf{a 100 W class-A amplifier draws 400 W playing silence.}
+
+\subsection{Class B, and the dead band}
+\label{c8:sec:b2}
+Two devices: an NPN follower pushes into the load on positive half-cycles, a PNP pulls on negative ones, and neither conducts at idle. Idle dissipation goes to zero and efficiency rises to $\pi/4$, \textbf{78.5 per cent}. \textbf{And it does not work,} for a reason unrelated to efficiency.
+
+\bookfigure{lectures/L08/appendix/images/crossover.png}{The transfer curve of a complementary pair, with the unbiased case flat across a dead band 1.3 volts wide centred on zero, and the biased case a straight line through the origin, the dead band shaded.}{c8:fig:crossover}
+
+Neither conducts until its base-emitter junction is forward biased, so the output stays at zero across an input band \textbf{two diode drops wide}, about 1.3 V: \textbf{crossover distortion}.
+
+\textbf{Its size is not the problem; its position is.} 1.3 V in a stage swinging 30 V is 4 per cent, tolerable-sounding, but it sits at the origin and music spends most of its time there. \textbf{The distortion is worst on quiet passages and vanishes at full output,} the opposite of every other distortion mechanism, and audible far below the level its percentage suggests.
+
+\subsection{Class AB, and the 26 millivolt rule}
+\label{c8:sec:b3}
+Bias both devices so a small current flows at idle: the dead band closes and idle dissipation is small rather than zero. Essentially every audio output stage is \textbf{class AB}.
+
+\bookfigure{lectures/L08/appendix/images/class_ab.png}{A class-AB output stage: an NPN and a PNP follower with their emitters facing each other through two small resistors to the output node, two series diodes between the bases setting the bias, and an eight ohm load to ground.}{c8:fig:classab}
+
+\textbf{How much idle current?} Enough to close the dead band and no more, stated on the resistors:
+
+\[
+  R_E = \frac{V_T}{I_q} = \frac{26\ \text{mV}}{I_q}
+\]
+
+At the 120 mA a stage of this size idles at, 0.217 ohm, and 0.22 is an E12 value.
+
+\textbf{The rule is $R_E = r_e$ the other way round,} putting $V_T$ across $R_E$, so Chapter~\ref{c7:ch:smallsignal}'s emitter factor is exactly 2. That is what it is choosing:
+
+\begin{booktable}{@{}Ll@{}}
+  \thead{} & \thead{Value} \\
+  \midrule
+  $r_e$ at 120 mA & 0.217 ohm \\
+  $R_E$, E12 & 0.22 ohm \\
+  Emitter factor & 2.0 \\
+  Drop across $R_E$ at idle & 26 mV \\
+  Cost in the load: 0.22 in series with 8 & 2.7 per cent \\
+\end{booktable}
+
+\textbf{Two per cent of the signal for half the thermal sensitivity.} At 260 mV the emitter factor is 11 and 2.2 ohm in series with 8 has thrown away a fifth of the output power; at 2.6 mV the resistors do nothing. 26 mV is where those costs cross, the same trade as Chapter~\ref{c6:ch:bias}'s 220 mV rule.
+
+\subsection{Thermal runaway, and a fix that looks like nothing}
+\label{c8:sec:b4}
+An output transistor dissipates power, warms, drops its $V_{BE}$ by 2 mV per degree, and draws more idle current at fixed bias. \textbf{That loop can run away, and a runaway output stage destroys itself in seconds.} Both junctions drift, so a fixed bias is 4 mV per degree too generous, landing across $2(r_e + R_E)$:
+
+\[
+  \frac{1}{I_q}\frac{dI_q}{dT} = \frac{2\lvert dV_{BE}/dT\rvert}{2(r_e + R_E) I_q}
+\]
+
+\begin{narrowtable}{@{}lll@{}}
+  \thead{} & \thead{Per degree} & \thead{Over a 30 degree rise} \\
+  \midrule
+  No emitter resistors & 7.7 per cent & a factor of 9 \\
+  With the 26 mV rule & 3.8 per cent & a factor of 3 \\
+\end{narrowtable}
+
+\textbf{A factor of three is still a runaway.} The emitter resistors halve the problem and do not solve it: the 26 mV rule buys margin, not stability.
+
+\textbf{The fix is to make the bias voltage drift too.} Bolt the bias diodes to the output devices' heatsink and their forward voltages fall 2 mV per degree as well, cancelling to first order.
+
+\textbf{So the diodes are not setting a voltage. They are tracking one.} Read them as ``about 1.3 volts of bias'' and mount them on the board next to the driver, and the stage is correct at 25 degrees and destroys itself at 60. \textbf{This is the most common way a first output stage fails, and the schematic does not show it: the two circuits are drawn identically.}
+
+\textbf{Real circuits use a $V_{BE}$ multiplier:} one transistor with a divider from collector to base, giving an adjustable multiple of a base-emitter drop, on the heatsink. Adjustable, because the tracking is never exact (\secref{c8:sec:b8}).
+
+\subsection{Where the constant-drop model finally breaks}
+\label{c8:sec:b5}
+Since Chapter~\ref{c5:ch:transistor}, $V_{BE} \approx 0.65$ V has served for bias points at about 1 per cent error. \textbf{Here it fails completely.} What bias voltage does the stage above need to idle at 120 mA?
+
+\[
+  V_{bias} = 2\left(V_{BE}(I_q) + I_q R_E\right)
+\]
+
+$V_{BE}$ at 120 mA is \textbf{0.783 V}, not 0.65: it is $V_T \ln(I_C/I_S)$ and 120 mA is \textbf{2.2 decades} above the 0.72 mA where 0.65 V is right. The resistors add 26 mV each:
+
+\[
+  V_{bias} = 2(0.783 + 0.026) = 1.619\ \text{V}
+\]
+
+against \textbf{1.353 V} from the constant-drop model: a 16 per cent error in the voltage.
+
+\textbf{Run it backwards, which is where the size shows.} Apply 1.353 V and ask what idle current results. Not 120 mA reduced by a sixth: \textbf{1.96 mA}.
+
+\textbf{A factor of 61.} The stage is biased into class B, the dead band is open, and the amplifier sounds broken.
+
+\textbf{Why here and not before.} Every earlier use computed a \textbf{current from a voltage across a resistor}, where 133 mV inside a subtraction yielding 1.06 V is 12 per cent, entering linearly. Here it computes a \textbf{current from a voltage across a junction}, and 133 mV inside an exponential of scale 26 mV is $e^{5.1}$, a factor of 166. \textbf{The emitter resistors turn 166 into 61:} at 120 mA they carry 26 of the 133 mV, at 2 mA nothing.
+
+\textbf{The lesson is not that 0.65 is wrong,} but that a model's error is a property of the calculation it is used in. \textbf{And it explains the circuit:} two signal diodes at a few milliamps give 1.40 V and an idle current of 4.8 mA, which is why a real stage uses an adjustable multiplier or diodes at the output current.
+
+\subsection{The source follower, and the one thing that does not carry across}
+\label{c8:sec:b6}
+\secref{c7:sec:b6}'s substitution of $r_s$ for $r_e$ holds here too:
+
+\[
+  G = \frac{R_S}{r_s + R_S}, \qquad Z_{out} = r_s
+\]
+
+with the input resistance the bias network, because a gate draws no current. \textbf{A strict improvement:} the $h_{FE}^2$ of \secref{c8:sec:a5}, factor-of-four spread and all, becomes a resistor you chose. \textbf{The cost is the gain:} at 1 mA $r_s$ is 250 ohm where $r_e$ is 26, so into 1 kilohm the source follower gives 0.80 against 0.97.
+
+Ten times the current recovers only three, $g_m$ going as $\sqrt{I_D}$ (\secref{c5:sec:b2}). \textbf{A MOSFET output stage must be biased much harder for the same gain,} which is why output stages are usually bipolar.
+
+\textbf{And here the substitution is not exact.} A MOSFET's threshold rises when its source sits above its body, as in an integrated CMOS follower it always does. That \textbf{body effect} is a source-to-body transconductance $g_{mb}$, 10 to 30 per cent of the main one, appearing as unasked-for degeneration:
+
+\[
+  G = \frac{R_S}{r_s(1 + \chi) + R_S}
+\]
+
+With $\chi = 0.2$, 0.80 becomes \textbf{0.77}: why a discrete source follower and a CMOS one do not give the same answer from the same equation.
+
+\subsection{What to build}
+\label{c8:sec:b7}
+
+\subsubsection{\code{ael/follower/stage.hpp}}
+\begin{booktable}{@{}LL@{}}
+  \thead{Function} & \thead{Returns} \\
+  \midrule
+  \code{gain(collectorCurrent, load)} & $R/(r_e + R)$. \\
+  \code{outputResistance(collectorCurrent, sourceResistance, beta)} & $r_e + R_{src}/h_{FE}$. \\
+  \code{inputResistance(collectorCurrent, load, beta)} & $h_{FE}(r_e + R)$. \\
+  \code{darlingtonEmitterResistance(outputCurrent)} & $2V_T/I$. Twice one device's, and $h_{FE}$ cancels. \\
+  \code{darlingtonGain(outputCurrent, load)} & $R/(2r_e + R)$: a little worse than a single follower. \\
+  \code{darlingtonInputResistance(outputCurrent, load, beta)} & $h_{FE}^2(2r_e + R)$. \\
+  \code{loadedGain(unloadedGain, outputResistance, load)} & The divider of \secref{c8:sec:a4}. \\
+  \code{intrinsicEmitterResistance(collectorCurrent)} & $V_T/I_C$. The quantity Chapter~\ref{c7:ch:smallsignal} named, re-exported here so that a follower result can be written without reaching into \code{ael::ssm}. \\
+\end{booktable}
+
+\code{loadedGain} is three characters of arithmetic and the most-used function in Chapter~\ref{c10:ch:amplifier}, which calls it eleven times. Write it here rather than inline at each call site.
+
+\subsubsection{\code{ael/output/classab.hpp}}
+\begin{booktable}{@{}LL@{}}
+  \thead{Function} & \thead{Returns} \\
+  \midrule
+  \code{degenerationResistor(idleCurrent)} & $V_T/I_q$: the 26 mV rule. \\
+  \code{biasVoltage(idleCurrent, emitterResistor)} & $2(V_{BE}(I_q) + I_q R_E)$, with $V_{BE}$ from the \textbf{exponential}. \\
+  \code{idleCurrent(bias, emitterResistor)} & The inverse. There is no closed form. \\
+  \code{driftPerDegree(idleCurrent, emitterResistor)} & The fraction of \secref{c8:sec:b4}. \\
+  \code{transfer(input, bias, vbeOn, load)} & The dead band of \secref{c8:sec:b2}. \\
+\end{booktable}
+
+\textbf{\code{idleCurrent} must not call a constant-drop approximation.} It inverts an equation with an exponential and a linear term that do not separate, and the whole of \secref{c8:sec:b5} is about what happens when you pretend they do. Bisect in the logarithm, or use Newton with the limiter you wrote in Chapter~\ref{c4:ch:feedback}.
+
+\subsubsection{What good looks like}
+About fifty lines. \code{idleCurrent} is the only one with a loop in it.
+
+\subsection{What this section is blind to}
+\label{c8:sec:b8}
+\begin{itemize}
+  \item \textbf{The tracking is never exact.} The generator runs at a few milliamps and the outputs at 120, and \secref{c6:sec:b5} established that the temperature coefficient depends on current. It also sits on the heatsink rather than the die, lagging by seconds. Hence the adjustment.
+  \item \textbf{Self-heating,} the loop that makes the drift a runaway. \secref{c6:sec:b6} deferred it here; still deferred, because a thermal model is a course of its own.
+  \item \textbf{Safe operating area.} 5 A with 40 V across it kills a small transistor whatever the average power, which is what \secref{c8:app:c}'s protection circuitry is for.
+  \item \textbf{A real loudspeaker,} a complex impedance varying by five across the audio band.
+  \item \textbf{Distortion, quantitatively.} Crossover distortion is audible; how many parts per million a given bias leaves is not said.
+\end{itemize}

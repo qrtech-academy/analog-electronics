@@ -1,0 +1,45 @@
+% Section 10.3, from lectures/L10/README.md: the objectives, the questions,
+% the further reading, and what the next chapter does with all of it.
+
+
+\section{Review}
+\label{c10:sec:review}
+
+\needspace{6\baselineskip}
+\subsection*{What you should be able to do now}
+After this chapter, you should be able to:
+\begin{itemize}
+  \item Name every stage of a discrete operational amplifier and say what it is responsible for.
+  \item Compute a gain budget with loading, and say why one without loading is not conservative but wrong.
+  \item Explain why an amplifier with no voltage gain in half its stages needs those stages.
+  \item Say why an open-loop DC operating point does not exist, and what your solver does about it.
+  \item Explain what a Miller capacitor is compensating and what would happen without it.
+  \item Close the loop and predict the closed-loop gain, the error, and the output resistance.
+  \item Run one program that predicts and solves the whole amplifier and reconciles the two.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Questions to test yourself}
+You should be able to answer:
+\begin{enumerate}
+  \item The pair gives 1923 and the common-emitter stage gives 1923. Why is the open-loop gain not 3.7 million?
+  \item The Darlington buffer has a voltage gain of 0.96. What is it worth, in decibels, and why?
+  \item What is the input resistance of the output stage, and what would it be if it were a single follower instead? What does that difference cost?
+  \item You solve the amplifier open-loop and the output sits at the negative rail. Is that a bug?
+  \item What would happen to the closed loop if the Miller capacitor were removed?
+  \item The closed-loop gain is 20 and the open-loop gain is a million. How far is the closed-loop gain from exactly 20, and what would make it closer?
+  \item The output stage's input resistance depends on $h_{FE}^2$, which varies by a factor of a hundred between devices. Why does the closed-loop gain not?
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\subsection*{Further reading}
+\begin{itemize}
+  \item \emph{The Art of Electronics}, Horowitz and Hill, chapter 4x, for a walk through several real operational amplifier schematics of the kind this chapter builds.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Looking ahead}
+\begin{itemize}
+  \item The exam papers~(Appendix~\ref{exam:ch:about}) are four hours each and cover the whole book.
+  \item What this book did not cover, and where to go for it, is in \secref{c10:sec:b8}.
+\end{itemize}

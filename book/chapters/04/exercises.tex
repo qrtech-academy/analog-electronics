@@ -1,0 +1,122 @@
+% Section 4.4, from lectures/L04/appendix/c_exercises.md. The worked solutions are not
+% printed; the aside says where they are.
+
+\section{Exercises}
+\label{c4:sec:exercises}
+
+Eight, ending with the Cross-check.
+
+\begin{aside}
+\textbf{How to check your work.} A \kindtag{Code} exercise is judged by the suite that ships with it: run \code{make test} at the root of the companion repository, with \code{AEL_DIR} pointing at your toolkit. A suite you have not started is reported as \code{SKIP} rather than as a failure, so the command is worth running from the first day. The hand calculations and designs are checked against the toolkit functions each one names.
+
+\textbf{The solutions are not in this book.} They are published in full in the companion repository, in \file{lectures/L04/appendix}, including the plausible wrong answer where there is one. Read them once you have your own answers, including the ones you are unsure about, because being unsure and right is a different thing from being unsure and wrong and the solutions say which is which.
+\end{aside}
+
+% ------------------------------------------------------------------
+\recall{What the loop gain decides}
+\label{c4:ex:1}
+\begin{enumerate}
+  \item Write the closed-loop gain in the form that makes the error visible, and identify the loop gain in it.
+  \item List four quantities that $1 + T$ divides or multiplies, and give the direction of each.
+  \item Name two things feedback does not improve, and say why not.
+  \item An amplifier is driven into clipping. What happens to its loop gain, and what does that say about the distortion at that moment?
+\end{enumerate}
+
+% ------------------------------------------------------------------
+\recall{The diode}
+\label{c4:ex:2}
+\begin{enumerate}
+  \item How much voltage does a decade of current cost, and where does that number come from?
+  \item A diode carries 1 mA at 0.65 V. What is its incremental resistance, and what else in this book is the same quantity?
+  \item State the constant-drop model, and say at how many currents it is exact.
+  \item Between 0.5 microamps and 4 mA a real diode's drop moves by about 240 mV. Give one design in which that matters and one in which it does not.
+\end{enumerate}
+
+% ------------------------------------------------------------------
+\handcalc{How much gain do you need}
+\label{c4:ex:3}
+An amplifier is to have a closed-loop gain of 100, accurate to 0.1 per cent.
+
+\begin{enumerate}
+  \item What loop gain does that need?
+  \item What open-loop gain?
+  \item The amplifier available has $A = 10^5$ and a gain-bandwidth product of 1 MHz. Does it meet the accuracy at DC? At 1 kHz?
+  \item At what frequency does the gain error reach 1 per cent?
+\end{enumerate}
+\checkyourself{\code{loopGain}, \code{gainError}}
+
+% ------------------------------------------------------------------
+\handcalc{The diode at two currents}
+\label{c4:ex:4}
+A 5 V supply drives a diode through a series resistor. $I_S = 10^{-14}$ A.
+
+\begin{enumerate}
+  \item For a 1 kilohm resistor, find the diode voltage and current, by hand. Two iterations of guess and correct is enough; start from 0.65 V.
+  \item Repeat for 100 kilohm.
+  \item Compare both with the constant-drop model's answer, and give the percentage error in the current for each.
+  \item The error in the current is small in both cases and the error in the diode voltage is not. Explain why, and say which of the two a bias network in Chapter~\ref{c6:ch:bias} will care about.
+\end{enumerate}
+\checkyourself{\code{current}, \code{conductance}}
+
+% ------------------------------------------------------------------
+\design{A half-wave rectifier with a stated ripple}
+\label{c4:ex:5}
+A 12 V peak, 50 Hz sinusoid feeds a half-wave rectifier into a smoothing capacitor and a 1 kilohm load. The output ripple must not exceed 0.5 V peak-to-peak.
+
+\begin{enumerate}
+  \item Choose the capacitor. State the assumption you are making about the discharge, and say whether it makes your answer optimistic or pessimistic.
+  \item State the DC output voltage, remembering the diode.
+  \item What peak current does the diode carry, roughly, and why is it so much larger than the load current?
+  \item Doubling the capacitor halves the ripple. What does it do to the peak diode current, and what does that suggest about how far this approach scales?
+\end{enumerate}
+
+% ------------------------------------------------------------------
+\codeexercise{Feedback and the diode model}
+\label{c4:ex:6}
+Implement \code{ael::feedback} and \code{ael::device::diode} to the specification in \secref{c4:sec:b5}.
+
+\code{limit} is four lines and is the only one that is not obvious. Damp only steps that are increasing and larger than two thermal voltages; leave everything else alone. Damping a decreasing step makes convergence worse, not better.
+
+% ------------------------------------------------------------------
+\codeexercise{The nonlinear solve}
+\label{c4:ex:7}
+Add \code{addDiode} to the netlist and write \code{ael::nr::solve}.
+
+Do this by calling your existing linear solve inside a loop, not by writing a second solver. Each iteration recomputes the diode stamps from the present guess and re-solves.
+
+Check three things before you believe it:
+
+\begin{enumerate}
+  \item A netlist with no diodes gives the same answer as \code{ael::mna::solve}, in one iteration.
+  \item The 5 V through 1 kilohm circuit converges in fewer than ten iterations.
+  \item Turning the limiting off makes it take about 170. If it does not, the limiting was not doing anything.
+\end{enumerate}
+
+% ------------------------------------------------------------------
+\crosscheck{The diode, and the model that is nearly right}
+\label{c4:ex:8}
+A 5 V supply, a series resistor, and a diode with $I_S = 10^{-14}$ A. Find the current, three ways, at two very different operating points.
+
+\textbf{Point one: a 1 kilohm resistor.}
+
+\begin{enumerate}
+  \item \textbf{By hand, with the constant-drop model.} $(5 - 0.65)/1000$.
+  \item \textbf{By hand, with the exponential.} Iterate from 0.65 V until it stops moving.
+  \item \textbf{By your solver.} \code{ael::nr::solve}.
+\end{enumerate}
+\textbf{Point two: repeat all three with a 10 megohm resistor.}
+
+Then state, for each point, the percentage disagreement between legs 1 and 3, and separately the difference in the diode voltage.
+
+\task{What to expect}
+\textbf{At 1 kilohm, leg 1 is 1.1 per cent high.} At 10 megohm it is \textbf{4.2 per cent low}. The sign reverses, and that is the interesting part: the constant-drop model is exact at exactly one current, the one where the diode really does sit at 0.65 V, and it errs in opposite directions either side.
+
+\textbf{Legs 2 and 3 should agree to about six significant figures.} Both are solving the same transcendental equation, one by hand iteration and one by Newton-Raphson.
+
+\textbf{The diode voltage disagrees far more than the current does.} 0.697 V against 0.65 V at one point, 0.458 V against 0.65 V at the other. The model calls a quantity constant that moves by 240 mV across the range.
+
+\textbf{Why the current error stays small anyway.} The diode voltage is subtracted from 5 V, so a 240 mV error in it is a 5 per cent error in what remains. The current error is bounded by that subtraction, and it would not be if the supply were 1 V instead of 5.
+
+\textbf{Try that.} Repeat point one with a 1 V supply and a 100 ohm resistor. The constant-drop model now errs by a much larger fraction, because the diode drop is most of the supply. That is the condition under which the model should not be used, and it is exactly the condition inside a transistor's base-emitter loop, which is why Chapter~\ref{c6:ch:bias} computes the drift from the exponential rather than from a constant.
+
+\textbf{If your solver reports 170 iterations}, the limiting is not working. If it reports \code{converged} false at 100, the limiting is inverted and it is damping the wrong steps.

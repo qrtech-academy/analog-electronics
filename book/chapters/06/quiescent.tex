@@ -1,0 +1,88 @@
+% Section 6.1, from lectures/L06/appendix/a_the_quiescent_point.md.
+
+\section{The quiescent point, and the divider that loads itself}
+\label{c6:app:a}
+
+An amplifier is a transistor held at an operating point with a signal moving it about. This section is the holding still.
+
+\subsection{Three numbers and a line}
+\label{c6:sec:a1}
+The \textbf{quiescent point} is where a stage sits with no signal applied: collector current, collector-emitter voltage, base-emitter voltage. The third is almost always about 0.65 V, so in practice it is two.
+
+The load line of \secref{c5:sec:a3} constrains them:
+
+\[
+  V_{CE} = V_{CC} - I_C(R_C + R_E)
+\]
+
+\textbf{Where on that line to sit is the first design decision.} A switch used the two ends; an amplifier wants room to move both ways, so it sits where the headroom above and below matches the wanted swing. Too near the supply clips the positive half of the output, too near saturation the negative half, and both waste the stage.
+
+\subsection{Divider bias}
+\label{c6:sec:a2}
+\bookfigure{lectures/L06/appendix/images/divider_bias.png}{A common-emitter stage biased from a 10 V supply through a 33 kilohm and 6.8 kilohm divider, with 4.7 kilohm in the collector and 1 kilohm in the emitter, and the base, emitter and collector voltages marked.}{c6:fig:dividerbias}
+
+A divider sets the base voltage, the emitter follows one diode drop below, and the emitter resistor turns that voltage into a current:
+
+\[
+  V_B = V_{CC}\frac{R_2}{R_1 + R_2}, \qquad V_E = V_B - V_{BE}, \qquad I_C \approx \frac{V_E}{R_E}
+\]
+
+For the values in the figure, 33 kilohm over 6.8 kilohm on 10 V:
+
+\[
+  V_B = 1.71\ \text{V}, \qquad V_E = 1.06\ \text{V}, \qquad I_C = 1.06\ \text{mA}
+\]
+
+\textbf{Those expressions assume nothing is drawing current from the divider. Something is.}
+
+\subsection{The base current loads the divider}
+\label{c6:sec:a3}
+\[
+  I_B \approx \frac{I_C}{\beta} = \frac{1\ \text{mA}}{50} = 20\ \mu\text{A}
+\]
+
+as a first estimate, and it flows out of the divider through its Thevenin resistance of 5.64 kilohm~(\secref{c1:sec:a5}), so the base voltage droops. Solved to convergence the base current settles at 18.7 microamps:
+
+\[
+  \Delta V_B = I_B R_{th} = 18.7\ \mu\text{A} \times 5.64\ \text{k}\Omega = 105\ \text{mV}
+\]
+
+The base sits at \textbf{1.60 V}, not 1.71, and the collector current is \textbf{0.934 mA}, not 1.06. The emitter resistor carries the \emph{emitter} current, 0.953 mA; the collector gets $\beta/(\beta+1)$ of it, and at $\beta = 50$ that two per cent is worth keeping in a calculation whose whole subject is the base current.
+
+\textbf{A 12 per cent error, and Chapter~\ref{c1:ch:circuits}'s loading arithmetic for the fourth time.} A divider loses a third of its output to a 10 kilohm load, a filter corner moves, two filter sections move each other's poles, and here a bias point moves 12 per cent. Chapter~\ref{c8:ch:follower}~(Chapter~\ref{c8:ch:follower}) and Chapter~\ref{c10:ch:amplifier}~(Chapter~\ref{c10:ch:amplifier}) are the fifth and the sixth.
+
+\textbf{It is also self-referential,} which is why it needs solving rather than substituting: the base current depends on the collector current, which depends on the base voltage, which depends on the base current. Two iterations by hand converge; a solver does not notice the difficulty.
+
+\subsection{Stiffness}
+\label{c6:sec:a4}
+Make the divider carry much more current than the base takes, so that the base current is a small perturbation on it. That ratio is the divider's \textbf{stiffness}:
+
+\[
+  \text{stiffness} = \frac{I_{divider}}{I_B}
+\]
+
+Here the divider carries 251 microamps and the base takes 18.7, so the stiffness is \textbf{13.4}. The usual rule of thumb is ten.
+
+\textbf{And the rule of thumb is why the error was 12 per cent.} A stiffness of ten accepts roughly one part in ten of the droop, which lands as ten-ish per cent in the collector current. The cure is a stiffer divider and the cost is supply current, one decade for one decade.
+
+\begin{narrowtable}{@{}lll@{}}
+  \thead{Stiffness} & \thead{Divider current here} & \thead{Error in $I_C$} \\
+  \midrule
+  13.4, as designed & 251 microamps & 12 per cent \\
+  50 & 1.0 mA & 4.6 per cent \\
+  200 & 4.1 mA & 2.6 per cent \\
+\end{narrowtable}
+
+\textbf{Those currents are not the first row scaled up,} and the reason is \secref{c6:sec:a3} a second time: a stiffer divider droops less, so the collector current climbs back towards 1.06 mA and the base current climbs with it. Scaling 251 microamps by 50/13.4 gives 0.93 mA, and 0.93 mA is a stiffness of 46. \textbf{What holds exactly is $I_{divider} = I_C \times \text{stiffness}/\beta$,} because the base current is $I_C/\beta$ by definition.
+
+\textbf{Stiffness attacks only the $R_{th}/\beta$ term,} so the last row does not reach one per cent. What is left is the $1/\beta$ by which the emitter current exceeds the collector current, and no divider however stiff can touch it. At 4.1 mA the divider burns four times the current the stage amplifies with, which is where a designer changes bias arrangement instead.
+
+\textbf{The alternative that removes the problem} is to make the base current negligible with a Darlington or a MOSFET, which Chapter~\ref{c8:ch:follower} and Chapter~\ref{c9:ch:diffpair} both do for exactly this reason.
+
+\subsection{What this section is blind to}
+\label{c6:sec:a5}
+\begin{itemize}
+  \item \textbf{Beta's spread.} The droop above used $\beta = 50$. A device with $\beta = 200$ droops a quarter as much, so the quiescent current moves with beta. The stiffness requirement makes that dependence small and never removes it.
+  \item \textbf{The signal.} Everything here is DC. What the stage does to a signal is Chapter~\ref{c7:ch:smallsignal}, and it depends on the operating point found here.
+  \item \textbf{Temperature.} The whole of \secref{c6:app:b}.
+\end{itemize}

@@ -1,0 +1,44 @@
+% Section 5.3, from lectures/L05/README.md: the objectives, the questions,
+% the further reading, and what the next chapter does with all of it.
+
+
+\section{Review}
+\label{c5:sec:review}
+
+\needspace{6\baselineskip}
+\subsection*{What you should be able to do now}
+After this chapter, you should be able to:
+\begin{itemize}
+  \item Write down the collector current of a BJT from its base-emitter voltage, and the base current from the collector current.
+  \item Say what 60 mV of extra base-emitter voltage does, and why that number is familiar.
+  \item Classify an operating point as cutoff, active or saturated from two voltages.
+  \item Design a switch from a load current and a logic level, without using $h_{FE}$ anywhere.
+  \item Say what forced beta is, why it is used, and what it costs.
+  \item Write down a MOSFET's drain current in both of its regions, and the boundary between them.
+  \item Say why a MOSFET stage needs about ten times the current of a BJT stage for the same gain, and where that stops being true.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Questions to test yourself}
+You should be able to answer:
+\begin{enumerate}
+  \item Two transistors of the same part number have $h_{FE}$ of 80 and 300. Which of your designs should care, and which should not?
+  \item A transistor has 1 mA of collector current. What is the incremental resistance of its base-emitter junction, and what will that quantity be called from Chapter~\ref{c7:ch:smallsignal} onwards?
+  \item Why is a saturated transistor's collector-emitter voltage not zero, and what would make it smaller?
+  \item A switch is designed with a forced beta of 10. What happens if the transistor turns out to have $h_{FE}$ of 300? What if it has 40?
+  \item Why does a switch waste less power than a linear stage doing the same job, and where does the power actually go in each case?
+  \item A MOSFET and a BJT both carry 1 mA. Which has the higher transconductance, by how much, and what would you have to do to the MOSFET to equalise them?
+  \item At what current do a BJT and a MOSFET have equal transconductance, and why is the answer suspicious?
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\subsection*{Further reading}
+\begin{itemize}
+  \item \emph{The Art of Electronics}, Horowitz and Hill, chapter 2, for the transistor introduced the same way, and chapter 3 for the MOSFET.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Looking ahead}
+\begin{itemize}
+  \item Chapter~\ref{c6:ch:bias} puts the device to work as an amplifier, which first means holding it still. Biasing, the quiescent point, and what an emitter resistor actually buys.
+\end{itemize}

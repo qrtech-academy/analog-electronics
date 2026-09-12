@@ -1,0 +1,50 @@
+% Chapter 5, typeset from lectures/L05. The first chapter of Part 2.
+
+\chapter{The transistor as a device and as a switch}
+\label{c5:ch:transistor}
+
+{\large\itshape The device, with as little semiconductor physics as can be managed, which is
+almost none.\par}
+
+\begin{chapterbox}{In this chapter}
+\begin{itemize}
+  \item The bipolar transistor as an exponential, a current gain, and a saturation voltage.
+  \item Why this book assumes $h_{FE} = 50$ everywhere, and what that assumption is worth.
+  \item Active, saturation and cutoff, and which one a switch lives in.
+  \item Designing a switch: the base resistor, forced beta, and the saturation voltage you pay for.
+  \item The MOSFET: a threshold, a square law, and two regions.
+  \item BJT against MOSFET, honestly, on gain, input impedance and current.
+  \item Building \code{ael::device::bjt} and \code{ael::device::mosfet}.
+\end{itemize}
+\end{chapterbox}
+
+\textbf{This chapter opens Part~2, which is the subject of the book.} Six chapters on the
+transistor amplifier: the device arrives here, the operating point in
+Chapter~\ref{c6:ch:bias}, and the small-signal model in Chapter~\ref{c7:ch:smallsignal}. Nothing
+is designed until all three exist.
+
+The device is one equation and one ratio. The collector current is an exponential in the
+base-emitter voltage --- \textbf{the same exponential as the diode of
+Chapter~\ref{c4:ch:feedback}, with the same $V_T$ and the same $I_S$, because the base-emitter
+junction \emph{is} a diode} --- and the base current is that divided by beta. Everything in the
+next five chapters is a consequence, including the one number the whole of Part~2 is written in
+terms of: the incremental resistance of that junction, 26 ohm at 1 mA, which arrives here as a
+property of a diode and is named $r_e$ in Chapter~\ref{c7:ch:smallsignal}.
+
+\textbf{Beta is not a parameter you may trust.} It varies by a factor of three between devices of
+the same part number and moves with temperature and current, so this book assumes 50, below the
+specified minimum of most small-signal parts, and every design must work there. The rule that
+follows runs through the rest of the book: \textbf{no design may depend on the value of beta}.
+Designing a switch is where you first see it enforced, by choosing the base current from a forced
+beta rather than from $h_{FE}$, and the design then stops depending on the parameter you were told
+not to trust.
+
+The MOSFET gets a section because one fact about it drives every comparison: its transconductance
+goes as the square root of its current where a bipolar transistor's goes as the current itself,
+which is a factor of ten at 1 mA. That number decides which device goes at an amplifier's input
+and which at its output, and both answers appear later.
+
+\input{chapters/05/bjt}
+\input{chapters/05/mosfet}
+\input{chapters/05/summary}
+\input{chapters/05/exercises}

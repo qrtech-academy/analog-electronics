@@ -1,0 +1,411 @@
+% aelbook.sty - the design of "Analog Electronics" as a book.
+%
+% Every visual decision lives here, so the chapters describe content and nothing else. The design
+% is the one the sibling courses use, with two changes this subject forces: mathematics is set
+% rather than quoted, because nearly every page has an expression on it, and the three inks are
+% the three diagrams/style.py draws with, so a figure and the page around it are one system.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{aelbook}[2026/09/12 Analog Electronics book design]
+
+% ------------------------------------------------------------------------------------------
+% Page. 7.5 x 9.25 in, a common trim for technical texts; the text block is wide enough for the
+% widest displayed expression in the book and for a figure at its natural 130 dpi.
+% ------------------------------------------------------------------------------------------
+\RequirePackage[
+  paperwidth=7.5in, paperheight=9.25in,
+  inner=0.85in, outer=1.15in, top=0.95in, bottom=1.0in,
+  headheight=14pt, headsep=18pt, footskip=30pt]{geometry}
+
+% ------------------------------------------------------------------------------------------
+% Type. Palatino for the text and for the mathematics, so that an r_e in a sentence and an r_e in
+% a displayed expression are the same glyph, and DejaVu Sans Mono for the code.
+% ------------------------------------------------------------------------------------------
+\RequirePackage{fontspec}
+\RequirePackage{unicode-math}
+\setmainfont{TeX Gyre Pagella}
+\setsansfont{TeX Gyre Heros}[Scale=MatchLowercase]
+\setmonofont{DejaVu Sans Mono}[Scale=0.84, HyphenChar=None, WordSpace={1,0.4,0.15}]
+\setmathfont{TeX Gyre Pagella Math}
+\RequirePackage[protrusion=true, expansion=true, tracking=true]{microtype}
+\SetTracking{encoding=*, shape=sc}{40}
+
+% ------------------------------------------------------------------------------------------
+% Colour. Three inks, and they mean here what they mean in the figures: red is the subject, blue
+% is what it is being compared against, amber is a third thing where a figure genuinely has one.
+% ------------------------------------------------------------------------------------------
+\RequirePackage[table]{xcolor}
+\definecolor{accent}{HTML}{C00000}
+\definecolor{accent2}{HTML}{0050B3}
+\definecolor{accent3}{HTML}{B35C00}
+\definecolor{muted}{HTML}{767676}
+\definecolor{ink}{HTML}{3A3A3A}
+\definecolor{fillaccent}{HTML}{F4D7D7}
+\definecolor{fillaccent2}{HTML}{D6E4F5}
+\definecolor{fillaccent3}{HTML}{F5E3CC}
+\definecolor{fillaccent4}{HTML}{D9EDDA}
+\definecolor{fillmuted}{HTML}{E8E8E8}
+\definecolor{codebg}{HTML}{F6F5F2}
+\definecolor{rule}{HTML}{BBBBBB}
+
+% ------------------------------------------------------------------------------------------
+% Structure: chapter openers, section heads, running heads.
+% ------------------------------------------------------------------------------------------
+\RequirePackage{titlesec}
+\RequirePackage{titletoc}
+
+\titleformat{\chapter}[display]
+  {\normalfont\raggedright}
+  {\color{accent}\large\scshape\lsstyle\MakeLowercase{\chaptertitlename}\enspace\thechapter}
+  {1.2ex}
+  {\fontsize{26}{30}\selectfont\bfseries}
+  [\vspace{1.4ex}{\color{rule}\titlerule[0.6pt]}]
+\titleformat{name=\chapter, numberless}[display]
+  {\normalfont\raggedright}
+  {}
+  {0pt}
+  {\fontsize{26}{30}\selectfont\bfseries}
+  [\vspace{1.4ex}{\color{rule}\titlerule[0.6pt]}]
+\titlespacing*{\chapter}{0pt}{0.35in}{0.3in}
+
+\titleformat{\section}
+  {\normalfont\Large\bfseries\raggedright}
+  {\color{accent}\thesection}{0.7em}{}
+\titlespacing*{\section}{0pt}{3.2ex plus 1ex minus .2ex}{1.4ex plus .2ex}
+
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\raggedright}
+  {\color{accent}\thesubsection}{0.7em}{}
+\titlespacing*{\subsection}{0pt}{2.6ex plus 1ex minus .2ex}{1.0ex plus .2ex}
+
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries\itshape\raggedright}
+  {}{0em}{}
+\titlespacing*{\subsubsection}{0pt}{2ex plus .8ex minus .2ex}{0.6ex plus .2ex}
+
+\titleformat{\paragraph}[runin]
+  {\normalfont\normalsize\bfseries}
+  {}{0em}{}[.]
+\titlespacing*{\paragraph}{0pt}{1.4ex plus .5ex minus .2ex}{0.6em}
+
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{1}
+
+% Contents: chapters bold with their number in the accent, sections indented beneath, and every
+% page number right-aligned in a box of its own, so a three-digit one never meets the leaders.
+\titlecontents{chapter}[0pt]
+  {\addvspace{1.4ex}\bfseries}
+  {\makebox[2em][l]{\color{accent}\thecontentslabel}}
+  {}
+  {\hfill\makebox[2.2em][r]{\contentspage}}
+\titlecontents{section}[2em]
+  {\addvspace{0.2ex}}
+  {\makebox[2.6em][l]{\thecontentslabel}}
+  {}
+  {\titlerule*[0.6pc]{.}\makebox[2.2em][r]{\contentspage}}
+
+\RequirePackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\enspace #1}}
+\fancyhead[LE]{\small\thepage\qquad\scshape\lsstyle\MakeLowercase{\leftmark}}
+\fancyhead[RO]{\small\scshape\lsstyle\MakeLowercase{\rightmark}\qquad\thepage}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\small\thepage}}
+\RequirePackage{emptypage}
+
+% ------------------------------------------------------------------------------------------
+% Text.
+% ------------------------------------------------------------------------------------------
+% Pages end where their text ends. The class default stretches every gap on a page to square the
+% bottom off, which a page with a figure pushed to the next one cannot survive.
+\raggedbottom
+% With a ragged bottom there is no reason to leave one line of a paragraph alone on a page.
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+% A subscripted symbol such as $V_{CE(sat)}$ cannot be broken, and neither can a header path;
+% a little emergency stretch lets the paragraph builder loosen a line around one rather than
+% push it into the margin.
+\setlength{\emergencystretch}{2.5em}
+\tolerance=1000
+\setlength{\parindent}{1.2em}
+\linespread{1.06}
+\RequirePackage[shortlabels]{enumitem}
+\setlist{itemsep=0.25ex, topsep=0.8ex, parsep=0pt}
+\setlist[itemize]{leftmargin=1.4em, label={\color{accent}\textbullet}}
+\setlist[itemize,2]{leftmargin=1.2em, label={\color{muted}\textendash}}
+\setlist[enumerate]{leftmargin=1.6em, label={\bfseries\arabic*.}}
+
+% Inline code. \detokenize is what lets a name such as addCurrentSource or an expression such as
+% std::complex<double> be written as it appears in the source, without escaping; aelbook.lua
+% undoes the two things \detokenize does to C++ (a doubled # and a space after a control word). A
+% literal % or an unbalanced brace is written \%, \{ or \}. \file is for file names, which are
+% long and need to break at a slash. Robust, so it survives the trip through the contents and the
+% running heads.
+\directlua{dofile(kpse.find_file("aelbook.lua"))}
+\DeclareRobustCommand{\code}[1]{%
+  {\ttfamily\directlua{aelbook_code("\luaescapestring{\detokenize{#1}}")}}}
+% A running head is set in small capitals by lowercasing it; code in a heading keeps its case,
+% because addBjt and Addbjt are two different names.
+\ExplSyntaxOn
+\tl_put_right:Nn \l_text_case_exclude_arg_tl { \code }
+\ExplSyntaxOff
+\RequirePackage{xurl}
+\urlstyle{tt}
+% xurl lets a URL break anywhere, which a long link needs; a file name breaks only at a slash or
+% a dot, so no name is ever split in half.
+\DeclareUrlCommand{\file}{\urlstyle{tt}\def\UrlBreaks{\do\/\do\.}\def\UrlBigBreaks{}}
+
+% Section references in the terse form the lectures use: (Appendix B.4) becomes (§2.2.4).
+\newcommand{\secref}[1]{\S\ref{#1}}
+\newcommand{\Secref}[1]{\S\ref{#1}}
+
+% The preface's sections are unnumbered, so a pointer into one names it rather than numbering it.
+% The name is given rather than fetched with \nameref, which titlesec's redefinition of \section
+% leaves empty for a starred heading.
+\newcommand{\prefref}[2]{\hyperref[#2]{\emph{#1}} in the Preface}
+
+% A lead-in for the notes the lectures are full of: "Note:", "Important:", "In short:".
+\newcommand{\note}[1][Note]{\textbf{#1:}\ }
+
+% ------------------------------------------------------------------------------------------
+% Mathematics. The lectures write units inside expressions constantly, so there is one command
+% for a quantity with a unit and the usual shorthands for the symbols that recur on every page.
+% ------------------------------------------------------------------------------------------
+\RequirePackage{amsmath}
+% \unit{k\Omega} sets a unit upright with a thin space in front of it, as 5.64 k\Omega.
+\newcommand{\unit}[1]{\,\mathrm{#1}}
+\newcommand{\ohm}{\,\Omega}
+\newcommand{\kohm}{\,\mathrm{k}\Omega}
+\newcommand{\Mohm}{\,\mathrm{M}\Omega}
+\newcommand{\parallelop}{\mathbin{\|}}
+% \eqnote{...} is a short comment set after a displayed expression, in the muted ink.
+\newcommand{\eqnote}[1]{\quad\text{\small\color{muted}#1}}
+
+% ------------------------------------------------------------------------------------------
+% Tables. Rules only where they separate; never a vertical one.
+% ------------------------------------------------------------------------------------------
+\RequirePackage{booktabs}
+\RequirePackage{tabularx}
+\RequirePackage{array}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{C}{>{\centering\arraybackslash}p}
+\setlength{\aboverulesep}{0.5ex}
+\setlength{\belowrulesep}{0.5ex}
+\newcommand{\thead}[1]{\textbf{#1}}
+% A table set in the flow of the text, full measure, one size down.
+\newenvironment{booktable}[1]
+  {\par\smallskip\noindent\small\tabularx{\linewidth}{#1}\toprule}
+  {\bottomrule\endtabularx\par\smallskip}
+% The same, at its natural width and centred, for tables of short cells.
+\newenvironment{narrowtable}[1]
+  {\par\smallskip\begin{center}\small\begin{tabular}{#1}\toprule}
+  {\bottomrule\end{tabular}\end{center}\par\smallskip}
+
+% ------------------------------------------------------------------------------------------
+% Figures. Every figure in this book is the lecture's own PNG, generated by diagrams/build.py and
+% included straight from the lecture tree, so redrawing a figure redraws it here too and the two
+% cannot drift apart. \figure{path}{caption}{label}, the path relative to the repository root.
+% ------------------------------------------------------------------------------------------
+\RequirePackage{graphicx}
+\RequirePackage{float}
+\RequirePackage{caption}
+\captionsetup{font=small, labelfont={bf,color=accent}, labelsep=quad,
+  justification=justified, skip=6pt}
+% Placed where it is written: these figures are argued about in the sentence before them, and a
+% figure that floats to the next page takes its own argument with it.
+\newcommand{\bookfigure}[4][\linewidth]{%
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=#1]{../#2}
+    \caption{#3}\label{#4}
+  \end{figure}}
+
+% ------------------------------------------------------------------------------------------
+% Code. A tinted block with a coloured edge; the edge says which language it is. Red for the C++
+% the toolkit is written in, blue for the shell, grey for what a program printed back.
+% ------------------------------------------------------------------------------------------
+\RequirePackage{listings}
+\RequirePackage[most]{tcolorbox}
+
+% listings knows C++98. Add what C++11 to C++17 made keywords; the attributes' spelling is left
+% alone, because [[nodiscard]] reads as punctuation around a name, which is what it is.
+\lstdefinelanguage{cpp17}[ISO]{C++}{
+  morekeywords={alignas, alignof, char16_t, char32_t, constexpr, decltype, noexcept, nullptr,
+    static_assert, thread_local, override, final},
+}
+
+\lstdefinestyle{base}{
+  basicstyle=\ttfamily\small,
+  columns=fixed,
+  keepspaces=true,
+  showstringspaces=false,
+  upquote=true,
+  tabsize=4,
+  breaklines=true,
+  breakatwhitespace=false,
+  % A wrapped line is marked at both ends. Boxed, because LuaTeX will not take colour or maths
+  % loose inside the discretionary a line break is made of.
+  prebreak={\mbox{\textcolor{muted}{\tiny$\hookleftarrow$}}},
+  postbreak={\mbox{\textcolor{muted}{\tiny$\hookrightarrow$}\space}},
+  aboveskip=0pt, belowskip=0pt,
+  commentstyle=\color{muted},
+  stringstyle=\color{accent2},
+}
+\lstdefinestyle{cpp}{style=base, language=cpp17,
+  keywordstyle=\color{accent2!85!black}\bfseries,
+  directivestyle=\color{accent}}
+\lstdefinestyle{shell}{style=base, language=bash,
+  keywordstyle={}, morekeywords={}, deletekeywords={test}}
+\lstdefinestyle{output}{style=base, language={}}
+
+\tcbset{
+  codeblock/.style={
+    enhanced, listing only, breakable,
+    colback=codebg, colframe=codebg, boxrule=0pt, arc=0pt, outer arc=0pt,
+    left=8pt, right=6pt, top=4pt, bottom=4pt,
+    before skip=1.2ex plus 2pt, after skip=1.4ex plus 2pt,
+    borderline west={2pt}{0pt}{#1}},
+}
+\newtcblisting{cppcode}{codeblock=accent!70, listing options={style=cpp}}
+\newtcblisting{shell}{codeblock=accent2!70, listing options={style=shell}}
+\newtcblisting{console}{codeblock=muted!60, listing options={style=output}}
+
+% ------------------------------------------------------------------------------------------
+% Boxes in the text.
+% ------------------------------------------------------------------------------------------
+% An aside: something true that the surrounding text is not about.
+\newtcolorbox{aside}[1][]{
+  enhanced, breakable,
+  colback=fillaccent2!45, colframe=fillaccent2!45, boxrule=0pt, arc=0pt,
+  left=10pt, right=10pt, top=6pt, bottom=6pt,
+  borderline west={2.5pt}{0pt}{accent2},
+  before skip=2ex, after skip=2ex,
+  fontupper=\small,
+  #1}
+% The box that opens a chapter, listing what is in it.
+\newtcolorbox{chapterbox}[1]{
+  enhanced, breakable,
+  colback=white, colframe=rule, boxrule=0.5pt, arc=0pt,
+  left=10pt, right=10pt, top=8pt, bottom=6pt,
+  fonttitle=\small\scshape\lsstyle, coltitle=accent, colbacktitle=white,
+  attach boxed title to top left={xshift=8pt, yshift=-2.2mm},
+  boxed title style={boxrule=0pt, arc=0pt, left=3pt, right=3pt, top=0pt, bottom=0pt},
+  title={#1},
+  before skip=2ex, after skip=2.5ex,
+  fontupper=\small}
+% The closing section of every theory section: what the treatment just given cannot see. It is a
+% standing feature of this course rather than an aside, so it gets a box of its own.
+\newtcolorbox{blindspot}[1][What this section is blind to]{
+  enhanced, breakable,
+  colback=fillmuted!50, colframe=fillmuted!50, boxrule=0pt, arc=0pt,
+  left=10pt, right=10pt, top=6pt, bottom=6pt,
+  borderline west={2.5pt}{0pt}{muted},
+  before skip=2ex, after skip=2ex,
+  fontupper=\small,
+  title={\small\scshape\lsstyle #1}, fonttitle=\normalfont, coltitle=muted,
+  colbacktitle=fillmuted!50, attach title to upper={\par\vspace{0.6ex}}}
+
+% ------------------------------------------------------------------------------------------
+% Every heading from here on ends with \@afterheading, so the paragraph after it starts flush
+% left, as it does after a \section.
+%
+% Exercises. Each lecture has six to ten, numbered within the chapter so that Exercise 2.5 can
+% never be mistaken for §2.5 or for another chapter's, and each carries its kind: Recall for what
+% you state from memory, Hand calculation for a number produced with a pencil, Design for a
+% requirement turned into E12 values, Code for a component of the toolkit, and Cross-check for
+% the one that closes every chapter.
+% ------------------------------------------------------------------------------------------
+\RequirePackage{needspace}
+\newcounter{exercise}[chapter]
+\renewcommand{\theexercise}{\thechapter.\arabic{exercise}}
+\newcommand{\kindtag}[2][fillmuted]{%
+  \tcbox[on line, colback=#1, colframe=#1, boxrule=0pt, arc=1.5pt,
+    left=3pt, right=3pt, top=1pt, bottom=1pt, boxsep=0pt]{%
+    \small\scshape\lsstyle\MakeLowercase{#2}}}
+% \exercise[fill]{Title}{Kind}
+\newcommand{\exercise}[3][fillmuted]{%
+  \par\addvspace{3ex plus 1ex}\needspace{8\baselineskip}%
+  \refstepcounter{exercise}%
+  \noindent{\large\bfseries{\color{accent}Exercise~\theexercise}\quad #2}%
+  \hfill\kindtag[#1]{#3}\par\nopagebreak\vspace{0.8ex}\@afterindentfalse\@afterheading}
+% The five kinds, so that a chapter writes \recall{...} rather than remembering a colour.
+\newcommand{\recall}[1]{\exercise[fillmuted]{#1}{Recall}}
+\newcommand{\handcalc}[1]{\exercise[fillaccent2]{#1}{Hand calculation}}
+\newcommand{\design}[1]{\exercise[fillaccent4]{#1}{Design}}
+\newcommand{\codeexercise}[1]{\exercise[fillaccent]{#1}{Code}}
+\newcommand{\crosscheck}[1]{\exercise[fillaccent3]{#1}{Cross-check}}
+% A part of an exercise with a heading of its own: "What to expect", "Check yourself".
+\newcommand{\task}[1]{\par\addvspace{1.6ex}\needspace{4\baselineskip}%
+  \noindent{\bfseries #1}\par\nopagebreak\vspace{0.3ex}\@afterindentfalse\@afterheading}
+% \checkyourself{a, b, c}: the toolkit functions an exercise can be checked against, set as a
+% run-in line at the end of it.
+\newcommand{\checkyourself}[1]{\par\addvspace{1.2ex}%
+  \noindent{\small\textbf{Check yourself:}\ #1}\par}
+
+% ------------------------------------------------------------------------------------------
+% The written papers. A question is numbered within its paper and carries its marks in the tag an
+% exercise carries its kind in; a part's marks are set flush right at the end of the part, the way
+% a printed paper sets them.
+% ------------------------------------------------------------------------------------------
+\newcounter{question}[chapter]
+% \question{Title}{Marks}. It sets the running head too, because a paper has no sections and a
+% recto page would otherwise carry nothing but its number.
+\newcommand{\question}[2]{%
+  \par\addvspace{3.5ex plus 1ex}\needspace{6\baselineskip}%
+  \refstepcounter{question}%
+  \markright{Question~\thequestion\enspace #1}%
+  \noindent{\large\bfseries{\color{accent}Question~\thequestion}\quad #1}%
+  \hfill\kindtag{#2 marks}\par\nopagebreak\vspace{0.8ex}\@afterindentfalse\@afterheading}
+% "mark" or "marks" after a number, which may be a half: 1 mark, 1.5 marks, 2 marks.
+\ExplSyntaxOn
+\cs_new:Npn \marksword #1 { \str_if_eq:nnTF {#1} {1} {mark} {marks} }
+\ExplSyntaxOff
+% \worth{N}: "(N marks)" at the right margin, on the part's last line if it fits.
+\newcommand{\worth}[1]{{\unskip\nobreak\hfil\penalty50\hskip1.5em\hbox{}\nobreak\hfill
+  \mbox{\small\itshape (#1~\marksword{#1})}\parfillskip=0pt\finalhyphendemerits=0\par}}
+% \qpart{a}: the lead-in of a lettered part of a question.
+\newcommand{\qpart}[1]{\par\addvspace{1.2ex}\noindent\textbf{(#1)}\enspace}
+% \credit{text}: a credit that is more than a number of marks ("1 mark; an answer of 6.8 kilohm
+% scores nothing"). Set on the right, ragged left, and wrapping: several of these run to three
+% lines, which \worth's single unbreakable box cannot do.
+\newcommand{\credit}[1]{%
+  \par\nobreak\vspace{0.3ex}%
+  {\small\itshape\leftskip=0.28\linewidth\relax\raggedleft\noindent (#1)\par}%
+  \vspace{0.5ex}\@afterindentfalse\@afterheading}
+% \answersection{N}{Title}{Marks}: the heading of the answers to one question, set like the
+% paper's own \question one size up and numbered by the question it answers rather than by a
+% section counter; it is in the contents and the running head, and linkable as
+% \answerprefix:q:N, where each set of answers sets \answerprefix to its own.
+\newcommand{\answerprefix}{ans}
+\newcommand{\answersection}[3]{%
+  \par\addvspace{4.5ex plus 1ex}\needspace{8\baselineskip}%
+  \phantomsection\addcontentsline{toc}{section}{Question~#1: #2}%
+  \markright{Question~#1\enspace #2}%
+  \def\@currentlabel{#1}\label{\answerprefix:q:#1}%
+  \noindent{\Large\bfseries{\color{accent}Question~#1}\quad #2}\hfill\kindtag{#3 marks}\par
+  \nopagebreak\vspace{1.2ex}\@afterindentfalse\@afterheading}
+% \answerpart{a}{4}: the heading of the answer to one part, with what it is worth.
+\newcommand{\answerpart}[2]{%
+  \par\addvspace{2.2ex plus .6ex}\needspace{4\baselineskip}%
+  \noindent{\bfseries\color{accent}(#1)}\hfill\kindtag{#2~\marksword{#2}}%
+  \par\nopagebreak\vspace{0.5ex}\@afterindentfalse\@afterheading}
+% \answerhead{a}{Title}{4}: the same, where the model answer gives the part a title of its own.
+\newcommand{\answerhead}[3]{%
+  \par\addvspace{2.2ex plus .6ex}\needspace{4\baselineskip}%
+  \noindent{\bfseries{\color{accent}(#1)}\quad #2}\hfill\kindtag{#3~\marksword{#3}}%
+  \par\nopagebreak\vspace{0.5ex}\@afterindentfalse\@afterheading}
+
+% ------------------------------------------------------------------------------------------
+% Links. Coloured on screen, quiet enough to print.
+% ------------------------------------------------------------------------------------------
+\RequirePackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=accent2!80!black, urlcolor=accent2!80!black,
+  citecolor=accent2!80!black, pdfauthor={Erik Pihl},
+  pdftitle={Analog Electronics},
+  pdfsubject={Copyright 2026 QRTECH Academy. Released under the MIT License}}
+\RequirePackage{bookmark}
+\pdfstringdefDisableCommands{\def\code#1{#1}\def\S{§}\def\file#1{#1}}
+
+\endinput

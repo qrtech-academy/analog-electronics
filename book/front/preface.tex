@@ -1,0 +1,325 @@
+% Preface: the README's About and "There Is No Instrument Here" sections, info/README.md's Who
+% This Is For, Prerequisites, course plan and What This Edition Leaves Out, info/toolkit.md, and
+% lectures/README.md's account of the exercises, as the front matter of a book.
+
+\chapter{Preface}
+\markboth{Preface}{Preface}
+
+This book is for embedded and software engineers who read a schematic every week and have never
+been shown how one is arrived at. You can write C++, you are comfortable rearranging an
+expression, and you have at some point been handed an amplifier stage with no way to tell whether
+it was right. It takes you from Ohm's law to a discrete operational amplifier you have designed,
+sized, predicted and solved, transistor by transistor.
+
+\textbf{The subject is the transistor amplifier.} Circuit theory, passives and the operational
+amplifier are built in the first four chapters because the last six need them, not for their own
+sake. That makes the book deliberately narrow: ten hours of lectures is not long enough for
+everything an analog textbook carries, so this edition keeps what decides a design and says
+plainly what it dropped, in \prefref{What this edition leaves out}{pre:sec:cuts}.
+
+\section*{How the book is organised}
+The book is typeset from a ten-lecture course, and each chapter is one lecture. Its sections are
+the lecture's appendices, in the same order and with the same subsections, so a chapter here and a
+lecture directory in the companion repository can be read side by side:
+
+\begin{booktable}{@{}p{4.6em}p{3.4em}p{5.6em}L@{}}
+  \thead{Chapter} & \thead{Lecture} & \thead{Part} & \thead{Topic} \\
+  \midrule
+  1  & \file{L01} & Foundations & Circuits, units, and the nodal solver \\
+  2  & \file{L02} & Foundations & Reactance, phasors, and frequency response \\
+  3  & \file{L03} & Foundations & Passive filters and the operational amplifier \\
+  4  & \file{L04} & Foundations & Feedback, active filters, and the diode \\
+  5  & \file{L05} & Transistors & The transistor as a device and as a switch \\
+  6  & \file{L06} & Transistors & Biasing, and what an emitter resistor actually buys \\
+  7  & \file{L07} & Transistors & Small-signal analysis: $r_e$, the emitter factor, the cascode \\
+  8  & \file{L08} & Transistors & Followers, and the output stage they turn into \\
+  9  & \file{L09} & Transistors & The differential amplifier \\
+  10 & \file{L10} & Transistors & Building an operational amplifier, and the capstone \\
+\end{booktable}
+
+\noindent Every chapter opens with what is in it, works through the material, closes with a review
+of what you should now be able to explain, and ends with its exercises. The appendices hold the
+two written papers and their model answers.
+
+\textbf{Three things about the ordering are deliberate}, and all three differ from how the subject
+is usually taught:
+\begin{itemize}
+  \item \textbf{The solver comes first.} Chapter~\ref{c1:ch:circuits} has you write nodal analysis
+    before you have met a single active device. It costs an hour and it pays for the rest of the
+    book: from then on every claim the material makes about a circuit can be checked against a
+    program you wrote, and no result has to be taken on authority.
+  \item \textbf{The operational amplifier comes before the transistor.} You use one as a black box
+    in Chapters~\ref{c3:ch:filters} and \ref{c4:ch:feedback}, and only in
+    Chapter~\ref{c10:ch:amplifier} do you build one. That inversion is the whole arc of the book:
+    the thing you were told to trust in the fourth chapter is the thing you design in the last.
+  \item \textbf{The imperfections come before the topologies.} Biasing, thermal drift and the
+    emitter factor are met in Chapters~\ref{c6:ch:bias} and \ref{c7:ch:smallsignal}, before any of
+    the clever stages. Meeting them early means that the question ``why would anyone use a current
+    mirror as a load'' has an answer you can compute rather than remember.
+\end{itemize}
+
+\section*{What you should be able to do at the end}
+Having worked through the book, you should be able to:
+\begin{itemize}
+  \item Solve any resistive network by nodal analysis, by hand and in code.
+  \item Read and predict a first-order frequency response, magnitude and phase, from its corner
+    alone, and say what a source resistance does to it.
+  \item Apply the two operational amplifier rules to any standard configuration, and say precisely
+    where each of them fails.
+  \item Compute a loop gain and everything it decides: gain error, distortion, impedances,
+    bandwidth.
+  \item Bias a transistor stage to a specification, including the base current's effect on the
+    divider that sets it, and state its thermal drift.
+  \item Derive gain, input resistance and output resistance for any stage in the book from one
+    small-signal model, and say which node each result belongs to.
+  \item Choose between a follower, a Darlington and a redesign from the arithmetic rather than
+    from habit.
+  \item Size a class-AB output stage and say why its bias generator is bolted to a heatsink.
+  \item Design a differential pair to a rejection requirement, and say which components do not
+    affect the answer.
+  \item Compute an operational amplifier's gain budget with loading, close the loop around it, and
+    predict the error.
+\end{itemize}
+
+\phantomsection
+\section*{What you are assumed to know}
+\label{pre:sec:prerequisites}
+You are expected to arrive already comfortable with:
+\begin{itemize}
+  \item \textbf{Ohm's law}, and what a resistor, a capacitor and a voltage source are. Nothing
+    beyond that is assumed about circuits; Chapters~\ref{c1:ch:circuits} and \ref{c2:ch:reactance}
+    build the rest.
+  \item \textbf{Engineering calculations}: rearranging an expression, working in decibels, taking
+    a logarithm, and being willing to carry an approximation and say how wrong it is.
+  \item \textbf{Complex numbers} far enough to accept that $j$ rotates by ninety degrees.
+    Chapter~\ref{c2:ch:reactance} uses that and builds the frequency domain out of it.
+\end{itemize}
+
+\textbf{No semiconductor physics is taught, and none is needed.} The transistor is introduced as a
+device with an exponential, a current gain and a saturation voltage. Depletion regions, carrier
+transport and the Ebers-Moll derivation are named once and not used.
+
+\textbf{C++ is used, and this is not a C++ book.} You write a small analysis library across the
+ten chapters. The C++ involved is free functions, plain structs, \code{std::vector} and
+\code{std::complex}. There is no class hierarchy anywhere in it. If you have written embedded
+C++, you have written harder code than any of it.
+
+\phantomsection
+\section*{There is no instrument here, and that is the design}
+\label{pre:sec:instrument}
+A book like this one usually comes with a breadboard, a bench supply, an oscilloscope and LTspice.
+This one does not. There is nothing to install but a C++ compiler, \code{make} and \code{git}.
+
+What replaces it is that \textbf{you write the instrument}. Across the ten chapters you build
+\code{ael}, an analog analysis library in C++: a netlist, a nodal solver, complex stamps for
+reactance, a Newton-Raphson loop, device models for the diode, the BJT and the MOSFET, and on top
+of them the closed-form results for every amplifier stage in the book. By Chapter~\ref{c10:ch:amplifier}
+they compose into one program that takes a discrete operational amplifier, predicts every node in
+it, and then solves it.
+
+\textbf{None of that code is in this book or in the repository.} Every component is specified in
+prose, with its interface declaration, in the section of the chapter that asks for it, and every
+one ships with a test suite that judges what you wrote.
+
+That trade cuts both ways:
+\begin{itemize}
+  \item \textbf{What you lose.} No breadboard, no oscilloscope, no real device spread, no
+    parasitics, no thermal behaviour you can feel with a fingertip, and no experience driving an
+    instrument. Where a number here differs from what a real measurement would give, the text says
+    so and says by how much.
+  \item \textbf{What you gain.} Every step is a function you wrote and can read. ``The simulator
+    says the gain is $-84$'' stops being an oracle. You know which term that came from, what it
+    assumed, and what would have to change to move it.
+\end{itemize}
+
+Verification works in three layers, and none of them is a bench:
+\begin{itemize}
+  \item \textbf{The Cross-check.} Every chapter ends with one exercise where you compute a number
+    by hand, then run your own closed-form code on it, then solve the same circuit numerically
+    with your own nodal solver. Three legs, and they are not equally authoritative: the hand
+    calculation drops terms on purpose, the closed form drops fewer, and the solver drops none but
+    tells you nothing about why. When two of them disagree by 8 per cent, finding out which one is
+    wrong, or that neither is, is the exercise, and each one ends by saying how large a
+    discrepancy to expect.
+  \item \textbf{The shipped test suites.} Every component you implement comes with a unit-test
+    suite written against the QAcademy Test framework. They tell you \emph{whether} you are right
+    without telling you \emph{why}, which is the middle ground self-study otherwise lacks.
+  \item \textbf{The two models against each other.} From Chapter~\ref{c7:ch:smallsignal} on, every
+    stage is computed twice: once from the closed form, once by the solver from the same netlist.
+    The closed form is the one you can reason with and the solver is the one that is right. Where
+    they part company, the text names the term responsible.
+\end{itemize}
+
+\phantomsection
+\section*{The toolkit you build}
+\label{pre:sec:toolkit}
+\code{ael} lives wherever you like, as long as you tell the test suites:
+
+\begin{shell}
+export AEL_DIR=~/ael
+make test
+\end{shell}
+
+\noindent The layout every suite assumes is \file{$AEL_DIR/include/ael/...} for the headers and
+\file{$AEL_DIR/source/ael/...} for the translation units. \textbf{The header path is part of each
+specification, not a suggestion}: the suites include exactly these paths, and a component written
+somewhere else stays dormant however correct it is.
+
+\begin{booktable}{@{}p{4.4em}p{12.4em}L@{}}
+  \thead{Chapter} & \thead{Header} & \thead{What it does} \\
+  \midrule
+  1  & \code{ael/net/netlist.hpp}      & \code{Netlist}: nodes, resistors, and independent sources \\
+  1  & \code{ael/mna/solver.hpp}       & \code{solve}: the DC nodal solve \\
+  2  & \code{ael/ac/sweep.hpp}         & \code{solveAt} and \code{sweep}: the same solve over complex admittances \\
+  3  & \code{ael/filter/response.hpp}  & Filter responses, resonance, Q, and the loaded cascade \\
+  3  & \code{ael/opamp/ideal.hpp}      & The configuration gains and the Schmitt thresholds \\
+  4  & \code{ael/feedback/loop.hpp}    & Loop gain, closed-loop gain, and the error \\
+  4  & \code{ael/device/diode.hpp}     & The diode equation, its conductance, and the step limiter \\
+  4  & \code{ael/nr/solve.hpp}         & The nonlinear DC operating point: the linear solve, in a loop \\
+  5  & \code{ael/device/bjt.hpp}       & The transport model, the three regions, and the switch \\
+  5  & \code{ael/device/mosfet.hpp}    & The square law, its two regions, and $g_m$ \\
+  6  & \code{ael/bias/point.hpp}       & The quiescent point including the droop, and the drift \\
+  7  & \code{ael/ssm/model.hpp}        & The $r_e$ model: gain, both resistances, EF, the cascode \\
+  8  & \code{ael/follower/stage.hpp}   & Follower gain, both resistances, and the Darlington \\
+  8  & \code{ael/output/classab.hpp}   & The 26 mV rule, the bias voltage, and the idle current \\
+  9  & \code{ael/diffpair/pair.hpp}    & Both gains, the rejection ratio, the tanh, and the offset \\
+  10 & \code{ael/report/amplifier.hpp} & The capstone: the budget, the open loop, the closed loop \\
+\end{booktable}
+
+\noindent Namespaces mirror the header \emph{directory}, so everything in \code{ael/ssm/model.hpp}
+is in \code{ael::ssm}. Two directories hold more than one component and take the file name as a
+third level: \code{ael/device/bjt.hpp} is \code{ael::device::bjt}, and \code{ael/opamp/ideal.hpp}
+is \code{ael::opamp::ideal}. Units are SI and unqualified throughout: where the text quotes 26 mV,
+the code carries \code{0.026}.
+
+\begin{aside}
+\textbf{Two sign conventions, fixed once}, because every component in the book reads them. A
+current source \emph{injects at its second node}: \code{addCurrentSource(from, to, current)} takes
+current out of \code{from} and pushes it into \code{to}, so one milliamp into a node with one
+kilohm to ground puts that node at $+1$ V. And a voltage source \emph{reports the current leaving
+its positive terminal}, so a 10 V source driving one kilohm reports $+10$ mA --- which is the
+opposite sign to the raw modified-nodal unknown. Get either backwards and \secref{c1:sec:b5}'s
+suite says so on the first run; get either backwards and keep it, and every bias calculation in
+Part~2 comes out inverted.
+\end{aside}
+
+\section*{What the exercises look like}
+Six to ten per chapter, each labelled with its kind:
+
+\begin{booktable}{@{}p{9.6em}L@{}}
+  \thead{Kind} & \thead{What it asks of you} \\
+  \midrule
+  \kindtag{Recall}                     & State a result without looking it up. \\
+  \kindtag[fillaccent2]{Hand calculation} & Produce a number with a pencil, making the
+    approximations deliberately and saying what each one costs. \\
+  \kindtag[fillaccent4]{Design}        & Start from a requirement and end with E12 component
+    values, the error they leave, and whether you would accept it. \\
+  \kindtag[fillaccent]{Code}           & Write a component of the toolkit, specified in prose and
+    judged by the shipped suite. \\
+  \kindtag[fillaccent3]{Cross-check}   & Compute one number three ways and reconcile them. Exactly
+    one per chapter, and it is always the last. \\
+\end{booktable}
+
+\textbf{The Cross-check is the signature exercise.} You compute a number by hand, run your own
+closed-form code on the same problem, and then solve the same circuit numerically with your own
+nodal solver. Three legs, none of them authoritative on its own. Every Cross-check ends by saying
+how large a discrepancy to expect and what each size of discrepancy would mean, because ``your two
+answers differ by 8 per cent'' is the lesson rather than a failure.
+
+\textbf{The solutions are not in this book.} They are published in full in the companion
+repository, under \file{lectures/LNN/appendix}, including the plausible wrong answer where there is
+one --- this is a self-study course, and a reader with nobody to ask cannot be left with an
+unanswered exercise. Try each exercise before you read its solution.
+
+\section*{Two written papers, and what they are not}
+Nothing in the course this book comes from is marked. Assessment is the exercises in every chapter,
+the test suite each component comes with, and the Cross-check that closes every chapter.
+
+Appendices~\ref{exam:ch:about} to \ref{ansb:ch:answers} hold two four-hour papers with worked
+solutions, and they check something else: \textbf{what you can reconstruct on paper, with the book
+out of the room.} Ten questions each, one per chapter.
+
+\textbf{They exist purely so that you can test your own knowledge after working through the book.
+They gate nothing, they are not a qualification, and no part of the book requires them.}
+
+\textbf{Take one after the last chapter.} Every paper has one question per chapter, so sitting one
+partway through examines material you have not read yet.
+
+\phantomsection
+\section*{What this edition leaves out}
+\label{pre:sec:cuts}
+About a thousand pages of standard treatment became ten chapters. What went, in full, and where it
+is:
+
+\begin{booktable}{@{}Lp{14.4em}@{}}
+  \thead{Cut} & \thead{Kept here as} \\
+  \midrule
+  Basic electronics as eight chapters: transformer design, rectifier sizing, rms &
+    Chapters~1 and 2, at the level later work needs \\
+  Passive filters as six chapters, each with its own full impedance treatment &
+    Chapter~3, one treatment covering all of them \\
+  Telescopic cascodes and CMOS amplifier topologies &
+    Not covered; the cascode itself is \secref{c7:sec:b5} \\
+  Output stages up to 1 kW: triple class-AB, CFP-EF, Zobel networks, protection &
+    \Secref{c8:app:c}, as reading \\
+  Sixteen appendices of full derivations &
+    The results, with the derivations cited \\
+  Noise analysis, Miller's theorem as a chapter, and CMOS frequency response &
+    The Miller effect in \secref{c7:sec:b5}; noise not at all \\
+  Oscillators, voltage regulators, and a CMOS comparator &
+    Not covered \\
+\end{booktable}
+
+\noindent The last two rows are material a full treatment would carry and this edition does not.
+\textbf{Noise in particular is a real omission:} it decides the input stage of any amplifier that
+matters, and it is the first thing to add if this course is ever extended. PCB layout, datasheet
+reading and phase margin as a design procedure are in neither.
+
+\textbf{Where the obvious answer is wrong}, the correction is taught rather than applied quietly.
+The two largest are Chapter~\ref{c6:ch:bias}'s thermal argument and
+Chapter~\ref{c7:ch:smallsignal}'s output resistance, and both are worked demolitions: the tempting
+claim, the arithmetic that breaks it, and the version that survives.
+
+\section*{Further reading}
+There is no set textbook: every derivation, figure and number here is written for this course. Two
+books are worth having beside it.
+\begin{itemize}
+  \item \textit{The Art of Electronics}, Horowitz and Hill, 3rd edition, is the natural companion.
+    It uses the same intrinsic-emitter-resistance approach this book is built on, and each chapter
+    names the parts of it that cover the same material.
+  \item \textit{Microelectronic Circuits}, Sedra and Smith, if you want the hybrid-pi treatment
+    instead, and the device physics this book skips.
+\end{itemize}
+
+\section*{Setting up}
+Everything here runs in a Linux terminal: on Linux itself, or on Windows through WSL. You need a
+C++17 compiler, \code{make} and \code{git}, and nothing else --- no LTspice, no MATLAB, no
+breadboard, no instrument. On WSL or Ubuntu:
+
+\begin{shell}
+sudo apt -y update
+sudo apt -y install git make g++
+g++ --version             # 9 or newer; CI builds with the g++ on ubuntu-24.04.
+\end{shell}
+
+\noindent Then clone the companion repository, together with the test framework it keeps as a
+submodule:
+
+\begin{shell}
+git clone --recursive https://github.com/qrtech-academy/analog-electronics.git
+\end{shell}
+
+\noindent Three commands at its root cover everything the book asks of it:
+
+\begin{shell}
+make help                 # List every target.
+make test                 # Build and run each chapter's suite against your toolkit.
+make lint                 # Links, house rules, quoted numbers, and formatting.
+\end{shell}
+
+\noindent \code{make test} needs \code{AEL_DIR} to know where your toolkit is. \textbf{With it
+unset the suites still build and still run}, and report that only each chapter's reference tests
+were active: every test for a component you have not written yet sits behind an
+\code{#if __has_include}, so it switches itself on the moment the header appears. That is the
+correct state on day one, and \textbf{anything not yet implemented is skipped loudly rather than
+failing}, which is what makes \code{make test} meaningful on the first day and on the last.

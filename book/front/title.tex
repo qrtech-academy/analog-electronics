@@ -1,0 +1,75 @@
+% Half-title, title and copyright pages.
+%
+% \bookversion is the release the PDF was built for: `make VERSION=v1.2.3` passes it in, and the
+% release workflow passes the tag. Without it the title page carries only the date of the build.
+\providecommand{\bookversion}{}
+\newcommand{\bookdate}{\number\day\space\ifcase\month\or January\or February\or March\or April\or
+  May\or June\or July\or August\or September\or October\or November\or December\fi\space
+  \number\year}
+\newcommand{\bookedition}{\ifx\bookversion\empty\else\bookversion\,·\,\fi\bookdate}
+
+\thispagestyle{empty}
+\vspace*{2.2in}
+\begin{flushright}
+  {\Large\bfseries Analog Electronics}
+\end{flushright}
+\cleardoublepage
+
+\thispagestyle{empty}
+\vspace*{1.1in}
+\begin{flushleft}
+  {\color{accent}\rule{0.9in}{2.5pt}}\par\vspace{1.4ex}
+  {\fontsize{32}{38}\selectfont\bfseries Analog\\[0.15ex] Electronics\par}
+  \vspace{2.2ex}
+  {\Large\itshape From Ohm's law to an operational amplifier\\you have designed,
+   transistor by transistor\par}
+  \vspace{1.2in}
+  {\large Erik Pihl\par}
+  \vfill
+  {\small\scshape\lsstyle qrtech academy\par}
+  \vspace{0.6ex}
+  {\small\color{muted} \bookedition\par}
+\end{flushleft}
+\newpage
+
+\thispagestyle{empty}
+\vspace*{\fill}
+{\small
+\noindent\textit{Analog Electronics}\\
+Copyright \textcopyright\ 2026 QRTECH Academy.
+
+\medskip
+\noindent This book, and the course material it is typeset from, is released under the MIT
+License, which is the license of the companion repository. You may use, copy, modify and
+redistribute it, including commercially, provided the copyright notice and the license text
+travel with it. The full text is in the repository, as \file{LICENSE}.
+
+\medskip
+\noindent The repository holds the lecture material, the exercises, the worked solutions that
+this book does not print, the figure sources, and the test suites that judge the analysis library
+you write:
+
+\medskip
+\noindent\url{https://github.com/qrtech-academy/analog-electronics}
+
+\medskip
+\noindent Every figure in this book is generated, from the Python in \file{diagrams/} of that
+repository, and is the same drawing the lectures show. Every number this book quotes as a result
+is checked against \file{diagrams/models.py} by the repository's own continuous integration, so a
+figure that is redrawn and a number that changes cannot silently disagree with the text around
+them.
+
+\medskip
+\noindent The C++ this book specifies is C++17, compiled with GCC. \textit{The Art of
+Electronics} and \textit{Microelectronic Circuits} are cited as further reading and are the
+property of their respective publishers. Part numbers such as the 2N3904 appear as examples of
+devices a design might use.
+
+\medskip
+\noindent Set in TeX Gyre Pagella and DejaVu Sans Mono with Lua\LaTeX.
+
+\medskip
+\noindent\textcolor{muted}{Typeset from the ten lectures of the course, their exercises, and the
+two written papers. This edition: \bookedition.}
+\par}
+\cleardoublepage

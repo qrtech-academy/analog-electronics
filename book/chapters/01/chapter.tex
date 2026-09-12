@@ -1,0 +1,48 @@
+% Chapter 1, typeset from lectures/L01: the README is the opener and the closing review, and each
+% appendix is a section, in the same order and with the same subsections.
+
+\chapter{Circuits, units, and the nodal solver}
+\label{c1:ch:circuits}
+
+{\large\itshape Circuit analysis as something a program does, built before there is anything
+interesting to analyse.\par}
+
+\begin{chapterbox}{In this chapter}
+\begin{itemize}
+  \item Charge, current, voltage and power, and the sign convention every later result depends on.
+  \item Series and parallel, and the voltage divider as the one circuit worth memorising.
+  \item Kirchhoff's two laws, which are the only physical content in the whole of circuit theory.
+  \item Thevenin and Norton, and loading as the reason either of them matters.
+  \item Nodal analysis: one unknown per node, one equation per node, and the conductance stamp.
+  \item Why a program that solves circuits is easier to write than the equations are to solve by
+    hand.
+  \item Building \code{ael::net} and \code{ael::mna}.
+\end{itemize}
+\end{chapterbox}
+
+This chapter is the circuit theory the rest of the book needs, and nothing more than that. Most of
+it will be familiar if you have an electronics background, and two parts of it will not be used the
+way you expect. The first is the \textbf{sign convention}: current into a component is positive,
+and every gain, every bias point and every output resistance in Part~2 inherits that choice, so it
+is fixed here rather than argued about in Chapter~\ref{c7:ch:smallsignal}. The second is
+\textbf{loading}. A divider gives 1.71 V until something is connected to it, at which point it
+gives 1.09 V, and that one subtraction is the single arithmetic fact this book returns to six
+times, in six different costumes, ending with an operational amplifier that loses 11 dB to it.
+
+Then you write a solver. \Secref{c1:app:b} has you implement nodal analysis before you have met a
+single active device, which costs an hour and pays for the rest of the book: from then on every
+claim the text makes about a circuit can be checked against a program you wrote, and no result has
+to be taken on authority. The method itself is one idea --- one unknown per node, one current-law
+equation per node, and a \emph{stamp} that turns each element into matrix entries without anyone
+deriving anything.
+
+Work the chapter in order. \Secref{c1:app:a} is the theory, and if you have the background it is a
+twenty-minute skim, except for \secref{c1:sec:a6}. \Secref{c1:app:b} builds the solver, and
+\secref{c1:sec:b5} is its specification. The exercises in \secref{c1:sec:exercises} are where you
+write the code and where the Cross-check shows you what three legs agreeing looks like, before a
+later chapter shows you what it looks like when they do not.
+
+\input{chapters/01/circuits}
+\input{chapters/01/nodal}
+\input{chapters/01/summary}
+\input{chapters/01/exercises}

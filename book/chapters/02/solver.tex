@@ -1,0 +1,101 @@
+% Section 2.2, from lectures/L02/appendix/b_the_ac_solver.md.
+
+\section{The complex stamps, and what to build}
+\label{c2:app:b}
+
+The frequency domain costs about thirty lines, and only because the Chapter~\ref{c1:ch:circuits} solver was written in a way that lets it. \secref{c2:sec:b4} is the specification.
+
+\subsection{Nothing about the method changes}
+\label{c2:sec:b1}
+The whole of \secref{c1:app:b} survives intact: one unknown per node, one current-law equation per node, one stamp per element, Gaussian elimination.
+
+\textbf{Only the number field changes.} Kirchhoff's current law does not care whether the currents are real or phasors, because the common $e^{j\omega t}$ divides out of every term. So the right way to write this chapter is not to: template the Chapter~\ref{c1:ch:circuits} solver on its scalar type and instantiate it twice.
+
+\begin{cppcode}
+template <typename T>
+[[nodiscard]] std::vector<T> solveLinearSystem(std::vector<std::vector<T>> matrix) noexcept;
+\end{cppcode}
+
+If that is hard, the usual culprit is the pivot search, which needs \code{std::abs} rather than \code{std::fabs} and must compare magnitudes rather than values.
+
+\subsection{The two new stamps}
+\label{c2:sec:b2}
+A capacitor between nodes $a$ and $b$ at angular frequency $\omega$ has admittance $j\omega C$, and stamps exactly like a resistor of that conductance:
+
+\[
+  Y_{aa} \mathrel{+}= j\omega C, \quad Y_{bb} \mathrel{+}= j\omega C, \quad Y_{ab} \mathrel{-}= j\omega C, \quad Y_{ba} \mathrel{-}= j\omega C
+\]
+
+An inductor has admittance $1/(j\omega L)$ and stamps the same way. That is the entire electrical content of this chapter.
+
+\textbf{One trap.} At zero frequency an inductor's admittance is infinite and a capacitor's is zero, so a sweep that includes DC divides by zero in the inductor stamp and goes singular in any circuit whose only path to ground is through a capacitor. This book's sweeps start above zero; a real simulator does the DC operating point separately, for exactly this reason.
+
+\subsection{What a sweep is for}
+\label{c2:sec:b3}
+A sweep answers the question people actually have, which is what shape the response is, and it is the input to every Bode plot in the rest of the book.
+
+\textbf{Sweeps are logarithmic, because responses are.} A linear sweep from 10 Hz to 100 kHz spends 99 per cent of its points above 1 kHz and shows a first-order corner as a kink at the left edge.
+
+\subsection{What to build}
+\label{c2:sec:b4}
+
+\subsubsection{Additions to \code{ael/net/netlist.hpp}}
+\begin{booktable}{@{}LL@{}}
+  \thead{Member} & \thead{Contract} \\
+  \midrule
+  \code{addCapacitor(Node a, Node b, double capacitance)} & Adds a capacitor, in farads. \\
+  \code{addInductor(Node a, Node b, double inductance)} & Adds an inductor, in henries. \\
+  \code{capacitorCount()}, \code{inductorCount()} & Element counts, matching the Chapter~\ref{c1:ch:circuits} pattern. \\
+\end{booktable}
+
+The Chapter~\ref{c1:ch:circuits} members and both Chapter~\ref{c1:ch:circuits} sign conventions are unchanged, and Chapter~\ref{c1:ch:circuits}'s suite still has to pass. Chapter~\ref{c10:ch:amplifier} links every suite in the book at once, so a change here that broke Chapter~\ref{c1:ch:circuits} would be found eventually and painfully.
+
+\subsubsection{\code{ael/ac/sweep.hpp}}
+\begin{cppcode}
+namespace ael::ac
+{
+struct Point
+{
+    double frequency{};                                ///< Hertz.
+    std::vector<std::complex<double>> nodeVoltages{};  ///< Indexed by Node. [Ground] is 0.
+    bool solved{false};
+};
+
+/// Solve at one frequency. Voltage sources are phasors of their own value at zero phase.
+[[nodiscard]] Point solveAt(const net::Netlist& netlist, double frequency) noexcept;
+
+/// Logarithmically spaced points from `first` to `last` inclusive. Both must be positive.
+[[nodiscard]] std::vector<Point> sweep(const net::Netlist& netlist, double first, double last,
+                                       std::size_t points) noexcept;
+}
+\end{cppcode}
+
+Three details the suite checks, each with a reason:
+
+\begin{itemize}
+  \item \textbf{A voltage source is a phasor of its own value at zero phase.} There is no separate AC amplitude, so a divider built for Chapter~\ref{c1:ch:circuits} can be swept without being rebuilt.
+  \item \textbf{\code{sweep} is logarithmic and inclusive at both ends.} \code{points} of 1 returns one point at \code{first}. \code{first} equal to \code{last} returns \code{points} identical points rather than dividing by zero.
+  \item \textbf{\code{sweep} returns empty for a non-positive frequency}, rather than producing infinity in the inductor stamp. The signature is \code{noexcept}, so reporting by exception is not open to it.
+\end{itemize}
+
+\subsubsection{What good looks like}
+Around forty new lines: ten for the two stamps, twenty for the sweep's frequency generation. If \code{solveAt} duplicates the elimination from Chapter~\ref{c1:ch:circuits}, stop and template that instead. The duplication is the thing this chapter is teaching against.
+
+\subsection{Reading a complex answer}
+\label{c2:sec:b5}
+\code{nodeVoltages[n]} is a phasor. Two lines turn it into what a plot wants:
+
+\begin{cppcode}
+const double magnitudeDb{20.0 * std::log10(std::abs(v))};
+const double phaseDegrees{std::arg(v) * 180.0 / M_PI};
+\end{cppcode}
+
+\textbf{The phase sign is the single most common defect in a first AC solver, and it is invisible in a magnitude plot.} A low-pass must produce a \emph{negative} phase: the output lags. If yours is positive at every frequency, the likely cause is a capacitor stamped with $1/(j\omega C)$, the impedance, where the admittance is wanted. The suite tests the phase at the corner for exactly this reason.
+
+\subsection{What this section is blind to}
+\label{c2:sec:b6}
+\begin{itemize}
+  \item \textbf{DC.} The sweep starts above zero and the stamps break there. Chapter~\ref{c1:ch:circuits}'s solver still answers a DC question, and from Chapter~\ref{c5:ch:transistor} the two are used together: the DC solve finds an operating point, the AC solve describes small movements around it.
+  \item \textbf{Nonlinearity.} Everything here assumes superposition, which a diode or a transistor breaks. Chapter~\ref{c4:ch:feedback} is where that is confronted.
+  \item \textbf{Noise.} A phasor describes a deterministic sinusoid. The thermal noise that decides how small a signal an amplifier can usefully handle is not in this book at all.
+\end{itemize}

@@ -1,0 +1,47 @@
+% Chapter 3, typeset from lectures/L03.
+
+\chapter{Passive filters and the operational amplifier}
+\label{c3:ch:filters}
+
+{\large\itshape The first useful circuits, and the first active device.\par}
+
+\begin{chapterbox}{In this chapter}
+\begin{itemize}
+  \item High-pass and low-pass RC, and the impedances they present on both sides.
+  \item Cascading, and why two sections in a row do not give you the corner you designed.
+  \item LC filters, resonance, and Q as two things at once: a sharpness and an overshoot.
+  \item The band-pass, and the trade its two corners cannot escape.
+  \item The operational amplifier as a black box, with two rules and nothing else.
+  \item Inverting, non-inverting, buffer, summing and difference, all from those two rules.
+  \item The comparator, hysteresis, and the Schmitt trigger, which are not amplifiers at all.
+  \item Building \code{ael::filter}, the VCVS element, and \code{ael::opamp}.
+\end{itemize}
+\end{chapterbox}
+
+Swap the two components of an RC section and a low-pass becomes a high-pass; everything else about
+them, including the corner, is the same. That is the first half of this chapter and it is
+straightforward. The second half starts when you put two identical sections in a row and measure
+the corner, and it is not the corner either section has: \textbf{the second section is a load on
+the first}, and this is Chapter~\ref{c1:ch:circuits}'s arithmetic for the third time, in a circuit
+where you cannot see it coming.
+
+If loading is the problem, then something with a high input impedance and a low output impedance
+between the sections is the answer, and that thing is an \textbf{operational amplifier}. It arrives
+here as a black box with two rules --- no current into the inputs, no voltage between them --- from
+which every standard configuration is one line of algebra. \textbf{You will use it on trust for
+seven chapters and build it out of transistors in the last one}, which is the whole arc of this
+book.
+
+The rules are asserted here and derived in Chapter~\ref{c4:ch:feedback}, and
+\secref{c3:sec:b4} is where they do not apply at all: take the feedback away and the circuit
+that results behaves in a way the rules would call impossible.
+
+\Secref{c3:app:a} is the passive filters, \secref{c3:app:b} is the amplifier and the
+specification in \secref{c3:sec:b5}. The Cross-check in \secref{c3:sec:exercises} has four legs
+rather than three, because the fourth one is the fix rather than another way of measuring the
+fault.
+
+\input{chapters/03/filters}
+\input{chapters/03/opamp}
+\input{chapters/03/summary}
+\input{chapters/03/exercises}

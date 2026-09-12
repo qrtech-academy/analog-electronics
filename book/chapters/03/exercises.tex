@@ -1,0 +1,115 @@
+% Section 3.4, from lectures/L03/appendix/c_exercises.md. The worked solutions are not
+% printed; the aside says where they are.
+
+\section{Exercises}
+\label{c3:sec:exercises}
+
+Eight, ending with the Cross-check. This one has four legs rather than three, because the fourth is the fix rather than another way of measuring the fault.
+
+\begin{aside}
+\textbf{How to check your work.} A \kindtag{Code} exercise is judged by the suite that ships with it: run \code{make test} at the root of the companion repository, with \code{AEL_DIR} pointing at your toolkit. A suite you have not started is reported as \code{SKIP} rather than as a failure, so the command is worth running from the first day. The hand calculations and designs are checked against the toolkit functions each one names.
+
+\textbf{The solutions are not in this book.} They are published in full in the companion repository, in \file{lectures/L03/appendix}, including the plausible wrong answer where there is one. Read them once you have your own answers, including the ones you are unsure about, because being unsure and right is a different thing from being unsure and wrong and the solutions say which is which.
+\end{aside}
+
+% ------------------------------------------------------------------
+\recall{The two rules}
+\label{c3:ex:1}
+\begin{enumerate}
+  \item State the two op-amp rules, and say which one is a property of the amplifier and which is a property of the feedback around it.
+  \item Name a circuit in which the second rule does not hold at all, and say what replaces it.
+  \item An amplifier has an open-loop gain of $10^5$ and its output sits at 10 V. How much voltage is actually between its inputs? Is the virtual short a good name?
+  \item Which of the two rules is the one that fails first as frequency rises, and why?
+\end{enumerate}
+
+% ------------------------------------------------------------------
+\recall{Complementary filters}
+\label{c3:ex:2}
+A low-pass and a high-pass are built from the same resistor and the same capacitor, driven from the same source.
+
+\begin{enumerate}
+  \item What is the phase of each at the corner?
+  \item Add the two outputs. What do you get, at the corner and at every other frequency?
+  \item Each is 3 dB down at the corner, and 3 dB down means 0.707. Two things that are each 0.707 of the input sum to the input exactly. Explain, without arithmetic, why that is not a contradiction.
+\end{enumerate}
+
+% ------------------------------------------------------------------
+\handcalc{What the second section does to the first}
+\label{c3:ex:3}
+Two identical RC low-pass sections, each 1 kilohm and 159 nanofarads, connected directly.
+
+\begin{enumerate}
+  \item The corner of one section alone.
+  \item The two pole frequencies of the pair, from \secref{c3:sec:a3}.
+  \item Their geometric mean. Compare it with part 1 and say what that tells you about what loading does.
+  \item The 3 dB point of the pair, and the factor by which it differs from the answer you would get by assuming the two sections are independent.
+\end{enumerate}
+\checkyourself{\code{rcCorner}, \code{cascadedCorner}}
+
+% ------------------------------------------------------------------
+\handcalc{What is inside a resonance}
+\label{c3:ex:4}
+A series RLC: 10 millihenry, 1 microfarad, 10 ohm, driven with 5 V at resonance.
+
+\begin{enumerate}
+  \item The resonant frequency and the reactance of each part at it.
+  \item The Q, and the bandwidth.
+  \item The current, and the voltage across each of the three components.
+  \item You are choosing a capacitor. What voltage rating does it need, and what would a reader who looked only at the transfer function have chosen?
+  \item The 10 ohm resistor is removed and the only resistance left is 0.5 ohm of inductor winding resistance. What happens to all five answers above?
+\end{enumerate}
+\checkyourself{\code{lcResonance}, \code{seriesQ}}
+
+% ------------------------------------------------------------------
+\design{A Schmitt trigger for a noisy signal}
+\label{c3:ex:5}
+A sensor output crosses zero slowly and carries about 100 mV peak-to-peak of noise. It drives a comparator on plus and minus 12 V rails, and the comparator's output must make exactly one transition per crossing.
+
+\begin{enumerate}
+  \item Choose the positive-feedback divider from E12 values. State the two thresholds and the gap.
+  \item Justify the gap: say why it is larger than the noise and why it is not much larger.
+  \item The sensor signal is a 1 Hz triangle of 2 V amplitude. By how much does the hysteresis delay the reported crossing, in milliseconds?
+  \item Somebody proposes fixing the noise with a low-pass filter instead. Give one advantage and one disadvantage against the Schmitt trigger.
+\end{enumerate}
+\checkyourself{\code{schmittThresholds}, \code{nearest_e12}}
+
+% ------------------------------------------------------------------
+\codeexercise{The filter responses}
+\label{c3:ex:6}
+Implement \code{ael::filter} to the specification in \secref{c3:sec:b5}.
+
+\code{cascadedCorner} is the only one that is not a one-liner. Find the two poles, then bisect on a logarithmic frequency axis for the point where the product of the two first-order magnitudes falls to $1/\sqrt{2}$. Do not look for a closed form; the exercise is partly to notice that a numerical answer is fine when the question is ``where is this curve equal to that''.
+
+% ------------------------------------------------------------------
+\codeexercise{The VCVS and the configurations}
+\label{c3:ex:7}
+Add \code{addVcvs} to \code{ael::net::Netlist} and write \code{ael::opamp::ideal}.
+
+The VCVS stamp is Chapter~\ref{c1:ch:circuits}'s voltage-source stamp with a different constraint row. If your Chapter~\ref{c1:ch:circuits} code wrote that stamp inline rather than as a function, this is the moment it becomes worth extracting.
+
+Then check the two against each other: build an inverting amplifier as a netlist with a VCVS of gain $10^5$, solve it, and compare with \code{invertingGain}. They should agree to about five decimal places, and the discrepancy is the finite gain, which is Chapter~\ref{c4:ch:feedback}'s subject.
+
+% ------------------------------------------------------------------
+\crosscheck{The cascade, and the buffer that fixes it}
+\label{c3:ex:8}
+Two identical RC low-pass sections, 1 kilohm and 159 nanofarads each, connected directly. Find the frequency at which the pair is 3 dB down.
+
+\begin{enumerate}
+  \item \textbf{By hand, assuming the sections are independent.} Square the single-section response and find where the result is 3 dB down. Write the number down.
+  \item \textbf{By your closed form.} \code{cascadedCorner}, which accounts for the loading.
+  \item \textbf{By your solver.} Build the four elements as one netlist and sweep.
+  \item \textbf{Then fix it.} Insert a VCVS of gain 1 between the two sections, as a follower, and sweep again.
+\end{enumerate}
+
+\task{What to expect}
+\textbf{Legs 1 and 3 disagree by a factor of 1.72, and leg 1 is wrong.} 644 Hz against 375 Hz. This is smaller than Chapter~\ref{c2:ch:reactance}'s factor of 6.6 and more insidious, because 644 Hz is a plausible answer arrived at by a plausible method: multiplying two transfer functions together is exactly what you would do if nobody had told you the sections interact.
+
+\textbf{Legs 2 and 3 should agree to three significant figures}, limited by your sweep density.
+
+\textbf{Leg 4 should give 644 Hz}, which is leg 1's answer. That is the point of the fourth leg: leg 1 was not wrong about the mathematics, it was wrong about the circuit, and inserting a buffer makes the circuit into the one leg 1 was describing.
+
+\textbf{If leg 4 still gives 375 Hz}, the VCVS is not isolating the sections. The usual cause is that its input is taken from the wrong node, so it is measuring the second section rather than the first.
+
+\textbf{If leg 4 gives something near 1001 Hz}, only one section is in the signal path; check that the follower's output feeds the second section rather than replacing it.
+
+\textbf{What to take from it.} A buffer does not improve the filter. It makes the filter behave like the one you designed, which is a different and more valuable thing. Every op-amp in the rest of this book is there for that reason rather than for its gain, and in Chapter~\ref{c8:ch:follower} an entire transistor stage exists for nothing else.

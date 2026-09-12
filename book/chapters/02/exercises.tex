@@ -1,0 +1,119 @@
+% Section 2.4, from lectures/L02/appendix/c_exercises.md. The worked solutions are not
+% printed; the aside says where they are.
+
+\section{Exercises}
+\label{c2:sec:exercises}
+
+Eight, ending with the Cross-check. The Cross-check is the first in this book where two of the three legs are expected to disagree, and by a large amount.
+
+\begin{aside}
+\textbf{How to check your work.} A \kindtag{Code} exercise is judged by the suite that ships with it: run \code{make test} at the root of the companion repository, with \code{AEL_DIR} pointing at your toolkit. A suite you have not started is reported as \code{SKIP} rather than as a failure, so the command is worth running from the first day. The hand calculations and designs are checked against the toolkit functions each one names.
+
+\textbf{The solutions are not in this book.} They are published in full in the companion repository, in \file{lectures/L02/appendix}, including the plausible wrong answer where there is one. Read them once you have your own answers, including the ones you are unsure about, because being unsure and right is a different thing from being unsure and wrong and the solutions say which is which.
+\end{aside}
+
+% ------------------------------------------------------------------
+\recall{What a phasor assumes}
+\label{c2:ex:1}
+A phasor replaces a sinusoid with one complex number.
+
+\begin{enumerate}
+  \item State the two properties a circuit must have before that substitution is legitimate.
+  \item Give a circuit from later in this book that has neither, and say what it does to a sinusoid that a phasor cannot describe.
+  \item A phasor analysis of a filter says the output is 0.707 of the input at the corner. A colleague switches the circuit on and measures 0.9 of the input. Neither of you is wrong. What is the colleague measuring?
+\end{enumerate}
+
+% ------------------------------------------------------------------
+\recall{Reading a response}
+\label{c2:ex:2}
+Without computing anything, sketch the magnitude and phase of a first-order low-pass with a corner at 1 kHz, from 10 Hz to 100 kHz. Mark on it:
+
+\begin{enumerate}
+  \item The two straight-line asymptotes and where they meet.
+  \item The magnitude and phase at the corner.
+  \item The magnitude and phase a decade below the corner.
+  \item The slope far above the corner, in dB per decade and in dB per octave.
+\end{enumerate}
+Then say which of those six numbers you had to remember and which follow from the others.
+
+% ------------------------------------------------------------------
+\handcalc{Time constants}
+\label{c2:ex:3}
+An amplifier's output settles towards its final value with a single dominant time constant, and it reaches 1 per cent of final in 5 microseconds.
+
+\begin{enumerate}
+  \item What is the time constant?
+  \item How long does it need to reach 0.01 per cent?
+  \item The specification is tightened from 8 bits to 14 bits of settling accuracy. By what factor does the settling time increase?
+  \item Somebody proposes doubling the bandwidth to fix it. By what factor does that help, and is it the cheaper of the two options?
+\end{enumerate}
+
+% ------------------------------------------------------------------
+\handcalc{Reactance and resonance}
+\label{c2:ex:4}
+A 10 millihenry inductor and a 1 microfarad capacitor.
+
+\begin{enumerate}
+  \item At what frequency do their reactances have the same magnitude?
+  \item What is that reactance, in ohms?
+  \item In series, what is the total impedance at that frequency, and why?
+  \item A 10 ohm resistor is put in series with both. What is the Q, and what voltage appears across the inductor alone when 1 V is applied at resonance?
+  \item Which of the answers above would change if the resistor were removed, and which would not?
+\end{enumerate}
+\checkyourself{\code{lc_resonance}, \code{inductor_reactance}, \code{series_rlc_q}}
+
+% ------------------------------------------------------------------
+\design{An anti-aliasing filter that has to be honest}
+\label{c2:ex:5}
+A sensor drives an RC low-pass. The requirement is at least 20 dB of attenuation at 10 kHz, and no more than 0.5 dB of loss at 100 Hz.
+
+\begin{enumerate}
+  \item Find the corner frequency that meets both, or show that no single-pole filter can.
+  \item Choose R and C from E12 values, given that the source driving the filter has an output resistance of 200 ohm and the load after it is 100 kilohm.
+  \item State the actual attenuation at 10 kHz and the actual loss at 100 Hz for your choice.
+  \item Say what you would do differently if the 20 dB requirement became 40 dB.
+\end{enumerate}
+\checkyourself{\code{rc_corner}, \code{first_order_response}, \code{nearest_e12}}
+
+% ------------------------------------------------------------------
+\codeexercise{The complex stamps}
+\label{c2:ex:6}
+Extend \code{ael::net::Netlist} with capacitors and inductors, and write \code{ael::ac::solveAt} to the specification in \secref{c2:sec:b4}.
+
+Template your Chapter~\ref{c1:ch:circuits} elimination on its scalar type rather than writing a second one. If that turns out to be difficult, the reason is worth finding: it is almost always \code{std::fabs} in the pivot search, which does not accept a complex number, where \code{std::abs} does and returns the magnitude.
+
+Confirm that the Chapter~\ref{c1:ch:circuits} suite still passes. It links the same \code{Netlist}.
+
+% ------------------------------------------------------------------
+\codeexercise{The sweep}
+\label{c2:ex:7}
+Write \code{ael::ac::sweep} to the same specification: logarithmic, inclusive at both ends, and well behaved for one point and for \code{first == last}.
+
+Then use it. Sweep the RC low-pass from \secref{c2:sec:a5} from 10 Hz to 100 kHz and print magnitude in dB and phase in degrees. Confirm by eye that the corner is where you expect and that the phase is negative.
+
+% ------------------------------------------------------------------
+\crosscheck{The filter that is not where you put it}
+\label{c2:ex:8}
+A 33 kilohm over 6.8 kilohm divider on a 10 V supply feeds an RC low-pass: 1 kilohm in series, then 159 nanofarads to ground. The output is taken across the capacitor.
+
+Find the corner frequency, three ways.
+
+\begin{enumerate}
+  \item \textbf{By hand, the obvious way.} The filter is 1 kilohm and 159 nanofarads, so $f_c = 1/(2\pi R C)$. Write the number down.
+  \item \textbf{By hand, thinking about it.} What resistance does the capacitor actually see looking back? Recompute.
+  \item \textbf{By your solver.} Build all four elements as one netlist, sweep it, and find the frequency at which the response is 3 dB below its low-frequency value.
+\end{enumerate}
+Then reconcile all three, and separately state what the low-frequency output voltage is and why it is not 10 V.
+
+\task{What to expect}
+\textbf{Legs 1 and 3 disagree by a factor of 6.6, and leg 1 is the wrong one.} This is the first Cross-check in the book where the hand calculation is not merely less precise but answering a different question, and the size of the error is the point: this is not a few per cent.
+
+\textbf{Legs 2 and 3 should agree to about three significant figures}, limited only by how finely you sweep. If you sweep 50 points per decade, expect to locate the corner to better than 1 per cent.
+
+\textbf{What leg 1 got wrong.} It used the series resistor and ignored the divider. The capacitor does not care which resistor is which; it sees everything looking back, which is the 1 kilohm in series with the divider's Thevenin resistance of 5.64 kilohm. The corner is therefore at 151 Hz, not 1001 Hz, and at 1001 Hz the filter is already 16.5 dB down rather than 3 dB down.
+
+\textbf{If leg 3 gives 1001 Hz}, the divider is not in your netlist, or its two resistors are stamped between the wrong nodes so that they are not in the signal path.
+
+\textbf{If leg 3 gives a low-frequency output of 10 V}, the divider is shorted out somewhere. It should give 1.71 V, which is the unloaded divider from Chapter~\ref{c1:ch:circuits}, because no direct current flows through the series resistor once the capacitor has charged.
+
+\textbf{The general lesson, which is Chapter~\ref{c1:ch:circuits}'s again.} A filter's corner is set by the total resistance the capacitor sees, and that includes everything upstream. This is the same arithmetic as \secref{c1:sec:a6} in a different costume, and it will appear a third time in Chapter~\ref{c3:ch:filters} when two filter sections are cascaded, and a fourth in Chapter~\ref{c10:ch:amplifier} where it costs an amplifier 11 dB.

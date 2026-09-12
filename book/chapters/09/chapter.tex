@@ -1,0 +1,48 @@
+% Chapter 9, typeset from lectures/L09.
+
+\chapter{The differential amplifier}
+\label{c9:ch:diffpair}
+
+{\large\itshape The input stage of every operational amplifier, and the first circuit that rejects
+rather than amplifies.\par}
+
+\begin{chapterbox}{In this chapter}
+\begin{itemize}
+  \item The first circuit in the book built to \textbf{reject} rather than to amplify.
+  \item The pair, the tail, and the two halves that share it.
+  \item Differential gain: the common-emitter result with a two in it, and where the two comes
+    from.
+  \item Common-mode gain, and the tail acting as a degeneration resistor of twice its value.
+  \item CMRR, and the fact that the collector resistor cancels out of it entirely.
+  \item Why every real pair has a current source in its tail and not a resistor.
+  \item The current-mirror load, and the two independent factors it wins.
+  \item The large-signal transfer: nine millivolts of linearity, and hard limiting beyond.
+  \item Offset, matching, and why almost every modern input stage is MOSFET.
+  \item Building \code{ael::diffpair}.
+\end{itemize}
+\end{chapterbox}
+
+A stage with two inputs and one job: amplify the difference, ignore what the two have in common.
+Everything else follows from that sentence, and from one component neither transistor is connected
+to at the top --- the \textbf{tail}. The tail fixes the total current; the inputs decide only how it
+is divided. When the two inputs move oppositely the tail node does not move at all, and when they
+move together it has to move with them. \textbf{That asymmetry is the circuit}, and both gains fall
+straight out of Chapter~\ref{c7:ch:smallsignal}'s model with nothing new derived.
+
+Rejection then has a surprise in it. Write the ratio of the two gains and \textbf{the collector
+resistor cancels, exactly and completely}: no choice of load improves rejection, and neither does
+the gain. The only lever is the tail --- and because a resistance in the tail implies a voltage
+across it, 80 dB of rejection from a resistor needs a 520 V supply. That is why the tail is a
+current source, and it generalises into the most useful sentence in Part~2: \textbf{a current
+source has a large resistance without a large voltage across it.}
+
+The same device then appears as a load, where it wins two independent factors that textbooks
+routinely run together, and the chapter separates them. Two things the small-signal model cannot
+see close it: the pair is linear over about nine millivolts and hard-limits beyond, which is where
+an amplifier's slew rate comes from; and the offset that mismatch produces, whose largest term is
+not a mismatch between the transistors at all.
+
+\input{chapters/09/pair}
+\input{chapters/09/rejection}
+\input{chapters/09/summary}
+\input{chapters/09/exercises}

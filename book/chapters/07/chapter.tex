@@ -1,0 +1,49 @@
+% Chapter 7, typeset from lectures/L07. The centre of the book.
+
+\chapter{Small-signal analysis: \texorpdfstring{$r_e$}{r\_e}, the emitter factor, and the cascode}
+\label{c7:ch:smallsignal}
+
+{\large\itshape The centre of the book, and the model the whole of Part~2 is built on.\par}
+
+\begin{chapterbox}{In this chapter}
+\begin{itemize}
+  \item Small-signal as a straight line through an operating point, and everything that discards.
+  \item Building the small-signal schematic: what to short, what to delete, what to replace.
+  \item The intrinsic emitter resistance, and where the 26 mV comes from.
+  \item Gain, input resistance and output resistance, each from one walk around a loop.
+  \item The emitter factor: one number for what degeneration costs and what it buys.
+  \item Which resistance that factor actually multiplies, which is not the obvious one.
+  \item The Early effect, and the current-mirror load that stops the boost being thrown away.
+  \item The source factor and $r_s$: the same results, transferred to the MOSFET by substitution.
+  \item The Miller effect, and the cascode as the answer to it.
+  \item Building \code{ael::ssm}, checked against the solver on every stage.
+\end{itemize}
+\end{chapterbox}
+
+\textbf{Everything before this chapter was preparation; everything after it is this applied.} If
+one chapter is worth rereading, it is this one.
+
+A transistor is exponential. Over a small enough excursion an exponential is a straight line, and
+the slope of that line at the operating point is all a signal ever sees. That slope has units of
+conductance, and its reciprocal is $r_e$, 26 ohm at 1 mA. \textbf{Every gain, every input
+resistance and every output resistance in the rest of the book is written in terms of it}, and each
+of the three comes from one walk around one loop, done the same way every time.
+
+The organising idea is the \textbf{emitter factor}, $EF = (r_e + R_E)/r_e$: one number that
+answers two questions at once, by what factor the gain falls and by what factor a resistance rises.
+The first half is exactly right. \textbf{The second half is attached to the wrong node in most
+treatments}, and the difference is a factor of ten. Getting it right is worth doing carefully,
+because it is what explains the current-mirror loads that would otherwise appear from nowhere in
+Chapters~\ref{c9:ch:diffpair} and \ref{c10:ch:amplifier}.
+
+Two more results close the chapter, and neither needs new machinery. The \textbf{MOSFET} arrives by
+naming $r_s = 1/g_m$, after which every result above transfers by substitution, with input
+resistance the one exception. And the \textbf{Miller effect} turns four picofarads into 1.5
+nanofarads and rolls a stage off at a hundred kilohertz, for which the answer is a
+\textbf{cascode} --- which turns out to be a degenerated stage whose degeneration resistor is
+another transistor's $r_o$.
+
+\input{chapters/07/model}
+\input{chapters/07/emitterfactor}
+\input{chapters/07/summary}
+\input{chapters/07/exercises}

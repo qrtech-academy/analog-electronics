@@ -1,0 +1,45 @@
+% Section 7.3, from lectures/L07/README.md: the objectives, the questions,
+% the further reading, and what the next chapter does with all of it.
+
+
+\section{Review}
+\label{c7:sec:review}
+
+\needspace{6\baselineskip}
+\subsection*{What you should be able to do now}
+After this chapter, you should be able to:
+\begin{itemize}
+  \item Draw the small-signal schematic of any stage in this book, and say what each step discarded.
+  \item Write $r_e$ from a collector current without looking it up.
+  \item Derive gain, input resistance and output resistance for a common-emitter stage.
+  \item State the emitter factor, and both of the things it decides.
+  \item Say which node the emitter factor's boost appears at, and why it is invisible at another.
+  \item Explain why a current-mirror load raises the gain by two independent mechanisms.
+  \item Transfer any result to a MOSFET by substituting $r_s$, and name the one result that does not transfer.
+  \item Compute a Miller capacitance, and say what a cascode does about it.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Questions to test yourself}
+You should be able to answer:
+\begin{enumerate}
+  \item $r_e$ is 26 ohm at 1 mA. Is it a resistor? What happens to it if the stage is switched off?
+  \item A stage has $R_C = 10$ kilohm and $R_E = 234$ ohm. What is its gain, and what would it be with the emitter resistor bypassed?
+  \item The emitter factor is ten. Name the two quantities it relates, and say which of them is a property of the transistor rather than of the stage.
+  \item Why does adding an emitter resistor barely change the output resistance of a resistively loaded stage, when it multiplies the resistance looking into the collector by ten?
+  \item A current mirror as a load raises the gain for two separate reasons. Name both.
+  \item A stage with a gain of 385 and 4 pF of collector-base capacitance is driven from 1 kilohm. Where is its input pole?
+  \item A cascode is often described as a new circuit. In what sense is it a stage you have already analysed?
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\subsection*{Further reading}
+\begin{itemize}
+  \item \emph{The Art of Electronics}, Horowitz and Hill, chapter 2, for the small-signal model, and \emph{Microelectronic Circuits}, Sedra and Smith, if you want the hybrid-pi form instead.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Looking ahead}
+\begin{itemize}
+  \item Chapter~\ref{c8:ch:follower} is the stage with no voltage gain at all, and why almost every design contains one. Followers, impedance transformation, and the output stage they turn into.
+\end{itemize}

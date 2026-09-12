@@ -1,0 +1,44 @@
+% Section 2.3, from lectures/L02/README.md: the objectives, the questions,
+% the further reading, and what the next chapter does with all of it.
+
+
+\section{Review}
+\label{c2:sec:review}
+
+\needspace{6\baselineskip}
+\subsection*{What you should be able to do now}
+After this chapter, you should be able to:
+\begin{itemize}
+  \item Compute a time constant, and say how many of them a given settling accuracy needs.
+  \item State what a phasor is, and what has to be true of a circuit before one is allowed.
+  \item Write down the impedance of a capacitor and an inductor at any frequency, from memory.
+  \item Sketch a first-order response from its corner frequency alone, magnitude and phase.
+  \item Say what the phase is doing a decade either side of the corner, to within a degree or two.
+  \item Convert between a ratio and decibels without a calculator for the cases that matter.
+  \item Extend a real solver from real to complex arithmetic without duplicating it.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Questions to test yourself}
+You should be able to answer:
+\begin{enumerate}
+  \item A capacitor's impedance falls with frequency and an inductor's rises. At what frequency are they equal, and what is special about a circuit operating there?
+  \item Why is $j\omega$ a legitimate substitute for $d/dt$, and what property of the circuit does that argument depend on?
+  \item A first-order low-pass is 3 dB down at its corner. How far down is it half a decade above?
+  \item At what frequency has a first-order low-pass reached 45 degrees of phase lag, and how much magnitude has it lost there?
+  \item A colleague says a filter ``does nothing'' a decade below its corner. What has it done to the phase there, and when would that matter?
+  \item Your AC solver returns the right magnitude and a phase of the wrong sign at every frequency. Name the most likely single cause.
+  \item An amplifier settles to within 1 per cent in 5 microseconds. How long does it need for 0.01 per cent, assuming one time constant dominates?
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\subsection*{Further reading}
+\begin{itemize}
+  \item \emph{The Art of Electronics}, Horowitz and Hill, chapter 1, sections on reactance and RC circuits, for a second treatment of the same material.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Looking ahead}
+\begin{itemize}
+  \item Chapter~\ref{c3:ch:filters} puts the reactance to work. Passive filters, what cascading two of them actually gives you, and then the operational amplifier as a black box with two rules.
+\end{itemize}

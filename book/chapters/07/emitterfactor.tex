@@ -1,0 +1,163 @@
+% Section 7.2, from lectures/L07/appendix/b_the_emitter_factor.md.
+
+\section{The emitter factor, and where it belongs}
+\label{c7:app:b}
+
+The organising idea of this treatment, the node it belongs to, and the three circuits that follow from getting that right.
+
+\subsection{The emitter factor}
+\label{c7:sec:b1}
+\[
+  EF = \frac{r_e + R_E}{r_e}
+\]
+
+The factor by which a degeneration resistor raises the \emph{total} emitter resistance, answering two questions at once: by what factor does the \textbf{gain fall}, and the \textbf{resistance it presents rise}?
+
+\textbf{The gain half is exactly right} (\secref{c7:sec:a5}). \textbf{The second half is the one to be careful about:} the obvious reading, that the \emph{stage's output resistance} rises by $EF$, is wrong for an arithmetic reason (\secref{c7:sec:b3}). Chapter~\ref{c6:ch:bias}'s 220 mV rule gives $EF \approx 10$.
+
+\subsection{The Early effect and $r_o$}
+\label{c7:sec:b2}
+Extending the collector-base depletion region shortens the base, raising the collector current slightly with collector voltage. One parameter, the Early voltage:
+
+\[
+  r_o = \frac{V_A}{I_C}
+\]
+
+With $V_A = 100$ V and 1 mA that is 100 kilohm.
+
+Ignorable until now, at under a per cent of a resistively loaded stage's gain. From here it is the subject of the next three sections.
+
+\subsection{Where the emitter factor actually belongs}
+\label{c7:sec:b3}
+The tempting way to write the stage's output resistance is
+
+\[
+  R_{out} \approx R_C \cdot EF
+\]
+
+\textbf{That cannot be right, and the reason is arithmetic.} The output resistance is $R_C$ in parallel with what the transistor presents there, and a parallel combination is smaller than either part. \textbf{No degeneration can raise a stage's output resistance above $R_C$,} yet $R_C \cdot EF$ is ten times it.
+
+What degeneration does raise is the resistance \textbf{looking into the collector}, with $R_C$ removed:
+
+\[
+  R_{into\ collector} = r_o\left[1 + g_m (R_E \parallel r_\pi)\right] + (R_E \parallel r_\pi)
+\]
+
+very nearly $r_o \cdot EF$: at 1 mA with 234 ohm, 863 kilohm against 1000. So
+
+\[
+  R_{out} = R_C \parallel R_{into\ collector} = 10\ \text{k} \parallel 863\ \text{k} = 9.89\ \text{k}\Omega
+\]
+
+against \textbf{9.09 kilohm} for the same stage with no emitter resistor.
+
+\bookfigure{lectures/L07/appendix/images/ef_attribution.png}{Four curves against the emitter resistor on logarithmic axes: the resistance looking into the collector rising steeply, the stage with a current-mirror load rising to a plateau, the stage with a ten kilohm resistive load lying flat, and the tempting $R_C$ times EF rising far above all of them.}{c7:fig:efattribution}
+
+\textbf{With a resistive load, degeneration buys 9 per cent of output resistance, not a factor of ten.} The boost is real and it is invisible, because $R_C$ swamps it.
+
+\subsection{Which is exactly why a current-mirror load exists}
+\label{c7:sec:b4}
+If $R_C$ throws the boost away, stop using $R_C$. A \textbf{current mirror} load presents its own $r_o$, 100 kilohm rather than 10.
+
+\bookfigure{lectures/L07/appendix/images/current_mirror.png}{A common-emitter stage with a PNP current mirror as its load: a diode-connected reference transistor setting the current, its base tied to the output transistor whose collector feeds the amplifier's collector, with the reference resistor in the left leg.}{c7:fig:currentmirror}
+
+\begin{booktable}{@{}lLl@{}}
+  \thead{Load} & \thead{Output resistance, no $R_E$} & \thead{With $R_E$ for $EF = 10$} \\
+  \midrule
+  10 kilohm resistor & 9.09 kilohm & 9.89 kilohm \\
+  Current mirror & 50 kilohm & 89.6 kilohm \\
+\end{booktable}
+
+The degeneration now nearly doubles the output resistance, and so the gain. \textbf{A mirror load raises gain for two independent reasons,} easy to run together:
+
+\begin{itemize}
+  \item \textbf{Its own $r_o$ is large,} loading the output node with 100 kilohm instead of 10. Nothing to do with degeneration.
+  \item \textbf{It stops the degeneration boost being swamped.} This is the emitter factor finally paying.
+\end{itemize}
+The resistively loaded gain of 385 becomes 1923, five times more, from the first mechanism alone.
+
+\subsection{Miller and the cascode}
+\label{c7:sec:b5}
+The collector-base capacitance bridges input to output, and the output moves the other way by the gain, so the input sees
+
+\[
+  C_{in} = C_{bc}(1 + |A_v|)
+\]
+
+Four picofarads across a stage with a gain of 385 is \textbf{1.5 nanofarads} at the input.
+
+\bookfigure{lectures/L07/appendix/images/miller_bandwidth.png}{Input corner frequency against stage gain on logarithmic axes, falling as the gain rises, against a horizontal line showing where the corner would be if the capacitance were not multiplied.}{c7:fig:millerbandwidth}
+
+Driven from 1 kilohm, a corner at \textbf{103 kHz} on a device good to hundreds of megahertz. \textbf{The Miller effect, not the transistor, limits an ordinary common-emitter stage.}
+
+\bookfigure{lectures/L07/appendix/images/cascode.png}{A cascode: a common-emitter transistor whose collector feeds the emitter of a second transistor held at a fixed base voltage, with the load resistor on the upper collector and the output taken there.}{c7:fig:cascode}
+
+\textbf{The cascode is the answer, and a stage you have already analysed.} A second transistor above the first, base held fixed, keeps the lower collector at a constant voltage: \textbf{no swing there means no Miller multiplication.}
+
+\[
+  R_{out(cascode)} = r_o\left[1 + g_m(r_o \parallel r_\pi)\right] + \dots \approx \beta r_o = 5\ \text{M}\Omega
+\]
+
+\textbf{That is \secref{c7:sec:b3}'s expression with $R_E = r_o$:} a cascode is a degenerated stage whose degeneration resistor is another transistor's $r_o$. The emitter factor that would apply is 3847, but the boost caps at $\beta$ because $r_\pi$ shunts the degeneration, reaching 5.04 megohm against a $\beta r_o$ ceiling of 5.00. \textbf{No new machinery.}
+
+\subsection{The MOSFET, in one substitution}
+\label{c7:sec:b6}
+No textbook gives the MOSFET a quantity behaving as $r_e$ does, so this book names one:
+
+\[
+  r_s = \frac{1}{g_m}
+\]
+
+\bookfigure{lectures/L07/appendix/images/re_to_rs.png}{Two identical stages side by side, a common-emitter BJT and a common-source MOSFET, with the same supply, load and degeneration resistors, labelled $r_e$ and $r_s$ respectively, and a note that one substitution carries every result across except input resistance.}{c7:fig:retors}
+
+Every result here transfers by writing $r_s$ for $r_e$; the 220 mV rule is unchanged:
+
+\[
+  A_v = -\frac{R_D}{r_s + R_S}, \qquad SF = \frac{r_s + R_S}{r_s}
+\]
+
+\textbf{The one exception is input resistance.} A gate draws no current, so there is no $\beta(r_e + R_E)$ term: a common-source stage's input resistance is its bias network. That is why Chapter~\ref{c9:ch:diffpair}'s input stage and Chapter~\ref{c10:ch:amplifier}'s inter-stage buffer are both MOSFETs.
+
+\textbf{Why $SF \approx 2$ where $EF \approx 10$,} both from 220 mV: $r_s$ at 1 mA is 250 ohm where $r_e$ is 26, transconductance being ten times lower (\secref{c5:sec:b2}).
+
+\subsection{What to build}
+\label{c7:sec:b7}
+
+\subsubsection{The Early effect in \code{ael/device/bjt.hpp}}
+Multiply the forward transport current by $(1 + V_{CE}/V_A)$. That is what makes $r_o$ finite and \secref{c7:sec:b3} measurable.
+
+\textbf{Multiply the collector current only. The base current does not get the factor,} so $h_{FE}$ comes out as $\beta_F(1 + V_{CE}/V_A)$ and rises with collector voltage, as a datasheet's curve does.
+
+\textbf{That placement is not a detail.} Putting the factor on the whole transport current, so both currents scale and beta stays flat, is tempting: it leaves Chapter~\ref{c5:ch:transistor}'s contract untouched. It also makes the base inject extra current into the emitter as the collector rises, which is degeneration through $R_E$, so the resistance into the collector comes out \textbf{18 per cent high} and \emph{above} the emitter factor instead of below it. Your own solver would then contradict \secref{c7:sec:b3}. One test catches that version.
+
+\textbf{One number the chapter does not quote.} Differentiating gives $r_o = (V_A + V_{CE})/I_C$: 105 kilohm at a collector 5 V up, not 100. Every closed form here uses the round figure, and that 5 per cent is one of the things the Cross-check's legs disagree about.
+
+\subsubsection{\code{ael/ssm/model.hpp}}
+\begin{booktable}{@{}LL@{}}
+  \thead{Function} & \thead{Returns} \\
+  \midrule
+  \code{intrinsicEmitterResistance(ic)} & $V_T/I_C$. \\
+  \code{intrinsicSourceResistance(gm)} & $1/g_m$. \\
+  \code{emitterFactor(ic, re)} & $(r_e + R_E)/r_e$. \\
+  \code{sourceFactor(gm, rs)} & The same, for a MOSFET. \\
+  \code{gain(rc, ic, re)} & $-R_C/(r_e + R_E)$. \\
+  \code{inputResistance(ic, re, beta)} & $\beta(r_e + R_E)$. \\
+  \code{resistanceIntoCollector(ic, re, beta, va)} & The expression of \secref{c7:sec:b3}. \\
+  \code{outputResistance(rc, ic, re, beta, va)} & That, in parallel with the load. \\
+  \code{cascodeOutputResistance(ic, beta, va)} & \code{resistanceIntoCollector} with $R_E = r_o$. \\
+  \code{millerCapacitance(gain, cbc)} & $C(1 + \lvert A \rvert)$. \\
+\end{booktable}
+
+\textbf{\code{cascodeOutputResistance} must be implemented by calling \code{resistanceIntoCollector},} not by a separate formula. Separate, and the claim that a cascode is degeneration by $r_o$ is an assertion rather than something the code demonstrates.
+
+\subsubsection{What good looks like}
+About seventy lines, of which none is longer than three.
+
+\subsection{What this section is blind to}
+\label{c7:sec:b8}
+\begin{itemize}
+  \item \textbf{The body effect}, which raises a MOSFET follower's threshold and costs real gain in Chapter~\ref{c8:ch:follower}.
+  \item \textbf{Base resistance.} Ohmic resistance in the base adds to $r_e$ at high current and limits noise.
+  \item \textbf{The second Miller capacitance.} The base-emitter capacitance is not multiplied but is far larger, and at high frequency it, not $C_{bc}$, sets the limit.
+  \item \textbf{High frequency, properly.} One capacitance and one pole is a caricature of a device with three capacitances and a transit time.
+\end{itemize}

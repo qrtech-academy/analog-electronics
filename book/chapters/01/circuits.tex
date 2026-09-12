@@ -1,0 +1,124 @@
+% Section 1.1, from lectures/L01/appendix/a_circuits_and_units.md.
+
+\section{Circuits, units, and loading}
+\label{c1:app:a}
+
+The circuit theory the rest of the book needs. With a background in electronics, read \secref{c1:sec:a1} for the conventions this book fixes, then skip to \secref{c1:sec:a6}.
+
+\subsection{The sign convention, and why it is worth five minutes}
+\label{c1:sec:a1}
+Neither current direction nor voltage polarity is discoverable from a schematic. Fixed once:
+
+\begin{itemize}
+  \item \textbf{Current into a terminal is positive.}
+  \item \textbf{A voltage is a difference.} $V_{AB}$ is the potential at A minus that at B; a single subscript such as $V_C$ is measured against ground.
+  \item \textbf{Ground is node zero,} by definition rather than by measurement.
+\end{itemize}
+\textbf{A bias voltage that comes out negative, or an inverting stage whose gain comes out positive, is a convention error before it is a physics error.}
+
+\subsection{The three quantities, and the one that is usually the answer}
+\label{c1:sec:a2}
+\begin{booktable}{@{}lllL@{}}
+  \thead{Quantity} & \thead{Symbol} & \thead{Unit} & \thead{What it is} \\
+  \midrule
+  Current & $I$ & ampere & Charge per second past a point. \\
+  Voltage & $V$ & volt & Energy per unit charge between two points. \\
+  Resistance & $R$ & ohm & The ratio of the two, when that ratio is constant. \\
+  Power & $P$ & watt & $VI$, and therefore $I^2R$ or $V^2/R$. \\
+\end{booktable}
+
+Ohm's law, $V = IR$, defines a resistor rather than stating a law of nature. Every device in Part~2 has a curve instead, and the work is choosing where on it to sit.
+
+\textbf{Power decides whether a design survives a bench.} 10 V across 1 kilohm is 100 mW, which a common surface-mount part will not tolerate, and nothing in the schematic says so.
+
+\subsection{Series, parallel, and the divider}
+\label{c1:sec:a3}
+Series adds resistance; parallel adds conductance.
+
+\[
+  R_{series} = R_1 + R_2
+\]
+
+\[
+  \frac{1}{R_{parallel}} = \frac{1}{R_1} + \frac{1}{R_2}, \qquad R_{parallel} = \frac{R_1 R_2}{R_1 + R_2}
+\]
+
+\textbf{The parallel combination is always smaller than either part,} which catches most slips.
+
+The \textbf{voltage divider} is the one circuit worth memorising: it is inside the bias network of Chapter~\ref{c6:ch:bias}, the feedback network of Chapter~\ref{c4:ch:feedback}, and the attenuator in front of every oscilloscope.
+
+\[
+  V_{out} = V_{in} \frac{R_{lower}}{R_{upper} + R_{lower}}
+\]
+
+\bookfigure{lectures/L01/appendix/images/divider.png}{A voltage divider from a 10 V supply, 33 kilohm over 6.8 kilohm, with the output node marked at 1.71 V and two annotations giving the Thevenin resistance of 5.6 kilohm and the loaded output of 1.09 V.}{c1:fig:divider}
+
+33 kilohm over 6.8 kilohm on a 10 V supply:
+
+\[
+  V_{out} = 10 \times \frac{6800}{33000 + 6800} = 1.71\ \text{V}
+\]
+
+\textbf{1.71 V, not the 1.65 V it looks like it ought to be.} No E12 pair gives 1.65 V from 10 V here, and Chapter~\ref{c6:ch:bias} designs a transistor stage around the difference.
+
+\subsection{Kirchhoff's two laws}
+\label{c1:sec:a4}
+The only physical content in circuit theory. \textbf{Current law:} currents into a node sum to zero, because charge does not accumulate at a junction.
+
+\[
+  \sum_k I_k = 0
+\]
+
+\textbf{Voltage law:} voltages around a closed loop sum to zero, because potential belongs to a point.
+
+\[
+  \sum_k V_k = 0
+\]
+
+\textbf{The current law is the one a program wants:} one equation per node, and a netlist has nodes.
+
+\subsection{Thevenin and Norton}
+\label{c1:sec:a5}
+Any network of linear elements, seen from two terminals, behaves exactly like a voltage source in series with a resistance.
+
+\begin{itemize}
+  \item $V_{th}$ is the open-circuit voltage: what appears with nothing attached.
+  \item $R_{th}$ is the resistance looking back in with every independent source killed. A voltage source becomes a short, a current source an open circuit.
+\end{itemize}
+Killing the divider's supply grounds the top of the upper leg, so the legs are in parallel:
+
+\[
+  R_{th} = R_{upper} \parallel R_{lower} = 5.64\ \text{k}\Omega
+\]
+
+\textbf{$R_{th}$ does not depend on which leg is the upper one, and is smaller than either.} Two megohms give one megohm; two ten-ohm resistors give five ohms.
+
+\textbf{Norton} is the same source drawn as a current source in parallel with the same resistance, $I_{no} = V_{th}/R_{th}$, and is the form \secref{c1:app:b} wants.
+
+\subsection{Loading, and why it decides everything later}
+\label{c1:sec:a6}
+The divider formula assumes nothing is attached. Attach something, and the lower leg becomes the lower leg in parallel with it. A 10 kilohm load on the 33k/6.8k divider:
+
+\[
+  V_{out} = 10 \times \frac{6800 \parallel 10000}{33000 + (6800 \parallel 10000)} = 1.09\ \text{V}
+\]
+
+\textbf{A third of the output gone, to a load most people would call light.} $R_{th}$ predicts it: 10 kilohm is not large compared with 5.6 kilohm.
+
+\bookfigure{lectures/L01/appendix/images/divider_loading.png}{Divider output against load resistance, falling from 1.71 V unloaded to below 0.2 V at a 100 ohm load, with a marker showing that a load equal to the 5.6 kilohm Thevenin resistance halves the output.}{c1:fig:dividerloading}
+
+\[
+  V_{delivered} = V_{th} \frac{R_{load}}{R_{th} + R_{load}}
+\]
+
+A load equal to $R_{th}$ halves the output; ten times larger costs about 9 per cent; ten times smaller leaves about 9 per cent.
+
+\textbf{This is the idea the book is built on.} Chapter~\ref{c3:ch:filters}: cascaded filter sections miss the corner you designed, because the second loads the first. Chapter~\ref{c8:ch:follower}: an emitter follower exists only to break a loading chain. Chapter~\ref{c10:ch:amplifier}: an op-amp loses 11 dB of open-loop gain to it, more than any other term.
+
+\subsection{What this section is blind to}
+\label{c1:sec:a7}
+\begin{itemize}
+  \item \textbf{Everything is linear.} From Chapter~\ref{c4:ch:feedback} the solver needs Newton-Raphson.
+  \item \textbf{Everything is at DC.} No capacitor, no inductor, no frequency. Chapter~\ref{c2:ch:reactance} adds them by making this same solver complex, not by starting again.
+  \item \textbf{Nothing has a tolerance.} Two 5 per cent resistors give a ratio good to about 10 per cent. Ignored until Chapter~\ref{c9:ch:diffpair}, where the matching of two transistors decides a stage's whole performance.
+\end{itemize}

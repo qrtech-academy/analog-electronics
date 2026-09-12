@@ -1,0 +1,45 @@
+% Section 9.3, from lectures/L09/README.md: the objectives, the questions,
+% the further reading, and what the next chapter does with all of it.
+
+
+\section{Review}
+\label{c9:sec:review}
+
+\needspace{6\baselineskip}
+\subsection*{What you should be able to do now}
+After this chapter, you should be able to:
+\begin{itemize}
+  \item Draw a differential pair and say what its tail current fixes.
+  \item Derive the differential gain and account for both factors of two in it.
+  \item Derive the common-mode gain and say why the tail appears doubled.
+  \item State CMRR, and say which components in the circuit do \textbf{not} affect it.
+  \item Choose a tail arrangement from a CMRR requirement, and justify the supply voltage it needs.
+  \item Give the two independent reasons a current-mirror load raises the gain.
+  \item State the pair's linear input range in millivolts, and say what it does outside it.
+  \item Compute an input-referred offset from a stated mismatch, and say which mismatch dominates.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Questions to test yourself}
+You should be able to answer:
+\begin{enumerate}
+  \item A pair with a 2 mA tail: what is $r_e$ on each side, and why is it 26 ohm rather than 13?
+  \item The differential gain to one collector is half what it is to both. Where did the other half go, and what would recover it?
+  \item Two designers argue about CMRR. One wants a larger collector resistor. Who is right?
+  \item What resistance would the tail need for 80 dB of rejection, and what supply voltage does that imply? Now say what is used instead.
+  \item A current-mirror load raises the gain by a factor of ten here. Split that ten into its two causes.
+  \item An input signal of 50 mV differential. Is the small-signal gain the right answer? Show why not.
+  \item A 1 per cent mismatch between the two collector resistors: what offset does it produce at the input, and how does that compare with 1 mV of $V_{BE}$ mismatch?
+\end{enumerate}
+
+\needspace{6\baselineskip}
+\subsection*{Further reading}
+\begin{itemize}
+  \item \emph{The Art of Electronics}, Horowitz and Hill, chapter 2, sections on the differential amplifier, for a second treatment of the same material.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\subsection*{Looking ahead}
+\begin{itemize}
+  \item Chapter~\ref{c10:ch:amplifier} assembles Chapter~\ref{c6:ch:bias} to this chapter into one operational amplifier, opens the black box of Chapter~\ref{c3:ch:filters}, closes the loop with Chapter~\ref{c4:ch:feedback}'s arithmetic, and is the capstone.
+\end{itemize}

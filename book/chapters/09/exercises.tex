@@ -1,0 +1,125 @@
+% Section 9.4, from lectures/L09/appendix/c_exercises.md. The worked solutions are not
+% printed; the aside says where they are.
+
+\section{Exercises}
+\label{c9:sec:exercises}
+
+Eight, ending with the Cross-check. That one asks a design lever to keep helping, and finds that past a certain point it stops.
+
+\begin{aside}
+\textbf{How to check your work.} A \kindtag{Code} exercise is judged by the suite that ships with it: run \code{make test} at the root of the companion repository, with \code{AEL_DIR} pointing at your toolkit. A suite you have not started is reported as \code{SKIP} rather than as a failure, so the command is worth running from the first day. The hand calculations and designs are checked against the toolkit functions each one names.
+
+\textbf{The solutions are not in this book.} They are published in full in the companion repository, in \file{lectures/L09/appendix}, including the plausible wrong answer where there is one. Read them once you have your own answers, including the ones you are unsure about, because being unsure and right is a different thing from being unsure and wrong and the solutions say which is which.
+\end{aside}
+
+% ------------------------------------------------------------------
+\recall{The pair and its tail}
+\label{c9:ex:1}
+\begin{enumerate}
+  \item What does the tail current fix, and what do the inputs decide?
+  \item A pair has a 2 mA tail. What is $r_e$ on each side? Show the step that is easy to get wrong.
+  \item Describe what the tail \emph{node} does for a differential input and for a common-mode input.
+  \item Why does a resistance $R_{tail}$ in the tail behave as $2R_{tail}$ to one half of the pair?
+\end{enumerate}
+
+% ------------------------------------------------------------------
+\recall{The two factors of two}
+\label{c9:ex:2}
+\begin{enumerate}
+  \item The differential gain to one collector is $-R_C/2r_e$. Account for the two.
+  \item There is a second factor of two available. Where, and what recovers it?
+  \item Which of the two is a property of what ``differential'' means, and which is a choice?
+  \item A current-mirror load raises the gain by a factor of ten in this chapter. Split that into its two independent causes and say what each is worth.
+\end{enumerate}
+
+% ------------------------------------------------------------------
+\handcalc{The pair, resistively loaded}
+\label{c9:ex:3}
+A pair with a 2 mA tail, $R_C = 10$ kilohm, $\beta = 50$, and a 10 kilohm tail resistor.
+
+\begin{enumerate}
+  \item $r_e$, the differential gain to one collector, and the gain to both.
+  \item The common-mode gain to one collector.
+  \item CMRR, as a ratio and in decibels.
+  \item Recompute all of parts 1 to 3 with $R_C = 100$ kilohm. Which numbers changed and which did not?
+\end{enumerate}
+\checkyourself{\code{differentialGain}, \code{commonModeGain}, \code{commonModeRejection}}
+
+% ------------------------------------------------------------------
+\handcalc{The large signal}
+\label{c9:ex:4}
+Same pair.
+
+\begin{enumerate}
+  \item The difference current at $v_d = 5$ mV, 26 mV and 100 mV.
+  \item What fraction of the tail has moved at each.
+  \item The input at which the small-signal answer is 1 per cent optimistic.
+  \item Repeat part 3 for a 20 mA tail. Explain the result.
+\end{enumerate}
+\checkyourself{\code{transfer}, \code{linearRange}}
+
+% ------------------------------------------------------------------
+\design{A pair to a rejection requirement}
+\label{c9:ex:5}
+An instrumentation front end needs 80 dB of common-mode rejection at a 2 mA tail, with a single-ended output.
+
+\begin{enumerate}
+  \item What tail resistance does that require?
+  \item What voltage would a resistor of that value drop, and what supply does that imply?
+  \item State the arrangement you would actually use, and what its incremental resistance has to be.
+  \item Now suppose you may take the output differentially instead. What matching would give you 80 dB with a 10 kilohm resistor tail? Comment on which of the two designs you would build.
+\end{enumerate}
+\checkyourself{\code{commonModeRejection}, \code{commonModeRejectionDifferential}, \code{decibels}}
+
+% ------------------------------------------------------------------
+\design{Offset}
+\label{c9:ex:6}
+The same pair, driven from a source of 10 kilohm on one input and 1 kilohm on the other.
+
+\begin{enumerate}
+  \item The base current in each input, and the offset voltage the \emph{imbalance} produces.
+  \item The offset from a 1 per cent collector-resistor mismatch, referred to the input.
+  \item The offset from 1 mV of $V_{BE}$ mismatch, referred to the input.
+  \item Rank the three, then say what single change removes the largest one entirely and what it costs.
+\end{enumerate}
+\checkyourself{\code{inputOffset}}
+
+% ------------------------------------------------------------------
+\codeexercise{The pair}
+\label{c9:ex:7}
+Implement \code{ael::diffpair} to the specification in \secref{c9:sec:b7}.
+
+\textbf{\code{commonModeRejection} must be the ratio of your own two gain functions}, not a separate formula. The chapter's central claim is that $R_C$ cancels out of that ratio, and writing it as a ratio is what makes your code demonstrate the claim rather than restate it.
+
+\textbf{\code{linearRange} must not take the tail current as an argument.} If your derivation produced one, something cancelled that you did not cancel.
+
+% ------------------------------------------------------------------
+\crosscheck{Common-mode rejection, and the lever that reverses}
+\label{c9:ex:8}
+The pair of Exercise~\ref{c9:ex:3}: 2 mA tail, 10 kilohm collector resistors, 10 kilohm tail resistor to a negative rail. Find its CMRR, four ways.
+
+\begin{enumerate}
+  \item \textbf{By hand.} $(2R_{tail} + r_e)/2r_e$.
+  \item \textbf{By your closed form, twice}, once with $R_C = 10$ kilohm and once with $R_C = 100$ kilohm.
+  \item \textbf{By your solver.} Apply a small differential input, measure the change at one collector; apply a small common-mode input, measure the change at the same collector; divide.
+  \item \textbf{Then replace the tail resistor with an ideal current source and repeat leg 3.}
+\end{enumerate}
+
+\task{What to expect}
+\textbf{Legs 1, 2 and 3 agree to about a decibel}, at 52, 52 and 51. \textbf{Leg 2 gives the same number twice}, because the collector resistor cancels; if yours does not, \code{commonModeRejection} is not a ratio of your two gains.
+
+\textbf{Leg 4 is the exercise, and it does not return infinity.} An ideal current source has infinite incremental resistance, so the expected answer is that the common-mode gain is zero. What you will get is a small, \textbf{stable, positive} common-mode gain and a CMRR of about \textbf{101 dB}.
+
+That number is not noise: check it by changing your perturbation size by three decades and watching it stay put. \textbf{Find out where it comes from.} Two experiments settle it:
+
+\begin{itemize}
+  \item Set the Early voltage to $10^9$ and repeat. The common-mode gain should collapse to your solver's arithmetic floor.
+  \item Set $\beta$ to 5000 and repeat. It should fall by about a hundred.
+\end{itemize}
+\textbf{Then sweep the tail.} Put the ideal source in parallel with a resistor and step that resistor from 1 megohm to 10. The closed form says CMRR rises without limit. Report what the solver says, and where the maximum is.
+
+\textbf{Finally, answer this.} Chapter~\ref{c5:ch:transistor}'s Cross-check had two legs that agreed with each other and were both wrong about a real device. This one has a leg that is exactly right about the model and answers a question nobody asked. \textbf{What is the single statement about models that covers both?}
+
+\textbf{If leg 3 gives a CMRR near 1}, you have applied the common-mode input to only one base.
+
+\textbf{If leg 3's differential gain is 385 rather than 192}, you have measured the difference between the two collectors rather than one of them, which is \secref{c9:sec:b5}'s question rather than this one.
